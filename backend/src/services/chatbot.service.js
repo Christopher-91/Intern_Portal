@@ -29,15 +29,45 @@ export const getChatbotConfig = () => {
  * Generate a context-aware mock reply based on the intern's safe context and question.
  */
 function generateMockResponse(message, safeContext = {}) {
-  const query = (message || '').toLowerCase();
+  const query = (message || '').toLowerCase().trim();
   const { requestStatus, certificateType } = safeContext;
 
-  // 1. Certificate Status queries
+  // 1. How to request a certificate / guidance on applying
+  const isRequestGuidance =
+    (query.includes('request') && (query.includes('certif') || query.includes('how') || query.includes('guide') || query.includes('step') || query.includes('modal'))) ||
+    (query.includes('apply') && (query.includes('certif') || query.includes('for'))) ||
+    (query.includes('get') && query.includes('certif')) ||
+    (query.includes('need') && query.includes('certif')) ||
+    (query.includes('issue') && query.includes('certif')) ||
+    query.includes('requesting a certificate') ||
+    query.includes('certificate request process');
+
+  // If asking how to request (and not explicitly asking for existing request status)
+  if (
+    isRequestGuidance &&
+    !query.includes('status') &&
+    !query.includes('track') &&
+    !query.includes('where is my') &&
+    !query.includes('check my')
+  ) {
+    return (
+      'To request a certificate in the portal, follow these simple steps:\n\n' +
+      '1. **Go to Certificates Tab**: In the top navigation bar, click on **Certificates**.\n' +
+      '2. **Click "Request certificate"**: In the Certificate Desk section, click the **Request certificate** button to open the application modal.\n' +
+      '3. **Select Certificate Type**: In the dropdown, choose the certificate you need (e.g. *Offer Letter*, *Bonafide*, *OJT Certificate*, *Experience Letter*, *Completion Certificate*, *Intern of the Month*, or *League Winner*).\n' +
+      '4. **Fill Required Details**: Provide any specific information needed for your document (such as College Name for Bonafide, or Reporting Manager for Offer Letter) and enter your **Reason / Justification**.\n' +
+      '5. **Submit Request**: Click **Submit Request**. Your request will enter "pending" status and be forwarded to your Team Leader for review, followed by Admin finalization.\n\n' +
+      'You can track its status anytime under the **My Requests** section on the Certificates page!'
+    );
+  }
+
+  // 2. Certificate Status queries
   if (
     query.includes('status') ||
     query.includes('track') ||
     query.includes('progress') ||
-    query.includes('where is my certificate')
+    query.includes('where is my certificate') ||
+    query.includes('check my request')
   ) {
     if (requestStatus === 'pending') {
       return 'Your certificate request is currently under review by your Team Leader. Once recommended, it will be forwarded to the Admin team for final approval.';
@@ -51,17 +81,7 @@ function generateMockResponse(message, safeContext = {}) {
     if (requestStatus === 'rejected') {
       return 'Your previous certificate request was rejected. Please review feedback from your Team Leader or contact them for clarification before reapplying.';
     }
-    return 'You have not submitted any certificate requests yet. You can apply for one by clicking the "Request Certificate" button on your dashboard.';
-  }
-
-  // 2. How to request a certificate
-  if (
-    query.includes('how to request') ||
-    query.includes('apply') ||
-    query.includes('issue certificate') ||
-    query.includes('certificate request')
-  ) {
-    return 'To request a certificate, navigate to the Certificates section or click the "Request Certificate" button on your dashboard. Select your domain track and submit your request for Team Leader review.';
+    return 'You have not submitted any certificate requests yet. To apply, navigate to the **Certificates** tab in the top navigation bar and click the **Request certificate** button.';
   }
 
   // 3. Internship timeline & duration

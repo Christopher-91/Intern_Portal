@@ -3,6 +3,23 @@ import useChat from '../hooks/useChat';
 import './ChatWidget.css';
 
 /**
+ * Parses simple inline markdown bold and italic formatting safely.
+ */
+const formatChatContent = (text) => {
+  if (!text) return null;
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
+};
+
+/**
  * ChatWidget Component
  * Floating conversational assistant for interns with accessible keyboard controls,
  * responsive theming, friendly retry states, and disclaimer guidance.
@@ -185,7 +202,7 @@ export default function ChatWidget() {
                 className={`chat-message-row ${msg.sender}`}
               >
                 <div className="chat-bubble">
-                  {msg.text}
+                  {formatChatContent(msg.text)}
                 </div>
                 <span className="chat-message-time">{msg.timestamp}</span>
               </div>
