@@ -1,31 +1,80 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import { login, getMe } from '../services/auth.service';
-import { useEffect } from 'react';
 
 // Context exports are intentionally colocated with their provider for consumers.
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token') || null);
-  // Set loading to TRUE initially so we wait for the first check before redirecting
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+/**
+ * Normalizes user data ensuring both nested `user` payloads and flat objects
+ * expose consistent top-level fields (id, _id, role).
+ */
+const normalizeUser = (raw) => {
+  if (!raw) return null;
+  const data = raw.user || raw;
+  if (!data || typeof data !== 'object') return null;
+  return {
+    ...data,
+    id: data.id || data._id || data.userId,
+    _id: data._id || data.id || data.userId,
+    role: data.role
+  };
+};
 
+export function AuthProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? normalizeUser(JSON.parse(saved)) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // If token and cached user exist in localStorage, render immediately and verify in background
+  const [loading, setLoading] = useState(() => {
+    const hasToken = Boolean(localStorage.getItem('token'));
+    const hasUser = Boolean(localStorage.getItem('user'));
+    if (hasToken && hasUser) return false;
+    return Boolean(hasToken);
+  });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        const currUser = await getMe();
-        setUser(currUser);
-      } catch (error) {
-        console.error("Auth check failed:", error);
+      const storedToken = localStorage.getItem('token');
+      if (!storedToken) {
         setUser(null);
         setToken(null);
-        localStorage.removeItem('token');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await getMe();
+        const userData = normalizeUser(res);
+
+        if (userData && userData.role) {
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+        } else {
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      } catch (err) {
+        console.warn("Auth check failed:", err);
+        const status = err?.status || err?.response?.status;
+        // Clear session if unauthorized or forbidden
+        if (status === 401 || status === 403) {
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
       } finally {
-        // Once the check is done (success or fail), stop loading
         setLoading(false);
       }
     };
@@ -33,30 +82,25 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, []);
 
-  // This is the correct way to "fix" it if you want to perform actions or log
-  // the user state immediately after it has successfully updated.
-  useEffect(() => {
-    console.log("Current user state is now:", user);
-  }, [user])
-
-
   const handleLogin = async (email, password) => {
     setLoading(true);
     setError(null);
     try {
       const data = await login(email, password);
 
-      // Assumes backend might return { token, user } or similar structure
       const userToken = data.token;
-      const userData = data.user || data;
+      const userData = normalizeUser(data.user || data);
 
       if (userToken) {
         setToken(userToken);
         localStorage.setItem('token', userToken);
       }
-      setUser(userData);
+      if (userData) {
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+      }
 
-      return data;
+      return { ...data, user: userData };
     } catch (err) {
       setError(err.message || 'Login failed');
       throw err;
@@ -70,12 +114,26 @@ export function AuthProvider({ children }) {
     setToken(null);
     setError(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, token, setToken, loading, setLoading, error, setError, handleLogin, handleLogout, isAuthenticated: !!user || !!token }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        setUser,
+        token,
+        setToken,
+        loading,
+        setLoading,
+        error,
+        setError,
+        handleLogin,
+        handleLogout,
+        isAuthenticated: !!user || !!token
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
-

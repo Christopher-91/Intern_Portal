@@ -145,7 +145,19 @@ export async function getMe(req, res) {
         }
 
         return res.status(200).json({
-            user
+            user: {
+                id: user._id,
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                mobileNo: user.mobileNo,
+                role: user.role,
+                domain: user.domain,
+                startDate: user.startDate,
+                endDate: user.endDate,
+                createdAt: user.createdAt,
+                passwordSetAt: user.passwordSetAt
+            }
         });
     } catch (err) {
         return res.status(500).json({

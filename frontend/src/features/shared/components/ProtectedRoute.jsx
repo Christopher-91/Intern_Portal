@@ -1,13 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 
-
 export default function ProtectedRoute({ allowedRoles }) {
-
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div style={{ color: 'white', textAlign: 'center', marginTop: '20%' }}>Loading...</div>;
+    return <div style={{ color: 'var(--text-muted, #9ca3af)', textAlign: 'center', marginTop: '20%' }}>Loading...</div>;
   }
 
   if (!user) {
@@ -15,7 +13,10 @@ export default function ProtectedRoute({ allowedRoles }) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+    if (user.role) {
+      return <Navigate to={`/${user.role}/dashboard`} replace />;
+    }
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;
