@@ -59,4 +59,9 @@ export const downloadCertificatePdf = async (id, fileName) => {
   link.click();
   link.remove();
   window.URL.revokeObjectURL(url);
-};
+};
+
+export const sendChatMessage = async (message) => {
+  const response = await internApi.post('/chat', { message });
+  return response.data;
+};

@@ -6,6 +6,7 @@ import RequestCertificateModal from '../components/RequestCertificateModal';
 import MyRequestsList from '../components/MyRequestsList';
 import NotificationBell from '../../../shared/components/NotificationBell';
 import SettingsPage from './SettingsPage';
+import ChatWidget from '../components/ChatWidget';
 import { updateProfile } from '../services/intern.service';
 import './InternDashboard.css';
 import './SettingsPage.css';
@@ -450,6 +451,7 @@ export default function InternDashboard({ initialView = 'dashboard' }) {
         )}
       </main>
       {showCertificateModal && <RequestCertificateModal onClose={() => setShowCertificateModal(false)} />}
+      <ChatWidget />
     </div>
   );
 }

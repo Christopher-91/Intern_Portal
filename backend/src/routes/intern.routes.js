@@ -1,6 +1,9 @@
 import express from 'express';
 import User from '../models/User.js';
 import verifyAuth from '../middlewares/verifyAuth.js';
+import checkRole from '../middlewares/checkRole.js';
+import chatRateLimit from '../middlewares/chatRateLimit.js';
+import { chatWithBot } from '../controllers/chatbot.controller.js';
 import {
   getMyRequests,
   getProfile,
@@ -56,5 +59,8 @@ internRouter.get('/requests/:id/certificate/download', downloadCertificateForReq
 internRouter.get('/notifications', getNotifications);
 internRouter.patch('/notifications/:id/read', markNotificationRead);
 internRouter.patch('/notifications/read-all', markAllNotificationsRead);
+
+// Task M: Chatbot guidance endpoint
+internRouter.post('/chat', verifyAuth, checkRole('intern'), chatRateLimit, chatWithBot);
 
 export default internRouter;
