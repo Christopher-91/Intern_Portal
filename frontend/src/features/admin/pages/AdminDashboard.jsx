@@ -37,7 +37,13 @@ import {
   Calendar,
   Sparkles,
   Shield,
-  Activity
+  Activity,
+  ArrowUpRight,
+  Zap,
+  CheckCircle2,
+  TrendingUp,
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 
 import './AdminDashboard.css';
@@ -49,6 +55,20 @@ const AdminDashboard = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [fallbackView, setFallbackView] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const todayFormatted = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
   const activeView = searchParams.get('view') || fallbackView;
 
   const initials = (user?.fullName || 'Admin')
@@ -358,6 +378,72 @@ const AdminDashboard = () => {
           <AnalyticsView onOpenRequests={() => changeView('requests')} />
         ) : activeView === 'overview' ? (
           <>
+            {/* Executive Hero Command Banner */}
+            <section className="admin-hero-banner" aria-label="Executive command overview">
+              <div className="admin-hero-content">
+                <div className="admin-hero-header-row">
+                  <div className="admin-hero-badge-pill">
+                    <span className="pulsing-live-dot" aria-hidden="true" />
+                    <span>ENTERPRISE COMMAND CENTER</span>
+                  </div>
+                  <span className="admin-hero-date">{todayFormatted}</span>
+                </div>
+
+                <h2 className="admin-hero-title">
+                  {getGreeting()},{' '}
+                  <span className="hero-name-gradient">
+                    {user?.fullName || 'Administrator'}
+                  </span>
+                </h2>
+                <p className="admin-hero-subtitle">
+                  UptoSkills core operations, internship cohort lifecycle, and tamper-proof credential pipelines are active.
+                </p>
+
+                <div className="admin-hero-status-strip">
+                  <div className="hero-status-chip">
+                    <ShieldCheck size={14} className="chip-icon success" />
+                    <span>Enterprise RBAC Active</span>
+                  </div>
+                  <div className="hero-status-chip">
+                    <Zap size={14} className="chip-icon amber" />
+                    <span>Automated Verification Online</span>
+                  </div>
+                  <div className="hero-status-chip">
+                    <Activity size={14} className="chip-icon indigo" />
+                    <span>99.98% System Health</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-hero-actions">
+                <button
+                  type="button"
+                  className="hero-action-btn primary"
+                  onClick={() => changeView('intern')}
+                >
+                  <UserPlus size={15} />
+                  <span>Add New Intern</span>
+                </button>
+                <button
+                  type="button"
+                  className="hero-action-btn secondary"
+                  onClick={() => changeView('requests')}
+                >
+                  <Inbox size={15} />
+                  <span>Review Requests</span>
+                </button>
+                <button
+                  type="button"
+                  className="hero-action-btn tertiary"
+                  onClick={() => changeView('analytics')}
+                >
+                  <ChartNoAxesCombined size={15} />
+                  <span>Deep Analytics</span>
+                  <ArrowUpRight size={13} className="hover-arrow" />
+                </button>
+              </div>
+            </section>
+
             {/* Executive Profile Section */}
             <section className="admin-profile-card" aria-label="Administrator profile">
               <div className="admin-profile-heading">
@@ -369,6 +455,7 @@ const AdminDashboard = () => {
                   <div className="admin-profile-badge-row">
                     <span className="admin-badge admin-badge-primary">Administrator</span>
                     <span className="admin-badge admin-badge-neutral">Full Privilege</span>
+                    <span className="admin-badge admin-badge-success">Session Active</span>
                   </div>
                   <h2>{user?.fullName || 'Administrator'}</h2>
                   <p className="admin-profile-email">{user?.email || 'admin@uptoskills.com'}</p>
@@ -417,65 +504,169 @@ const AdminDashboard = () => {
 
               {/* Quick Actions Shortcuts */}
               <div className="admin-quick-actions-section">
-                <h3 className="section-subtitle">Operational Shortcuts</h3>
+                <div className="section-subtitle-row">
+                  <h3 className="section-subtitle">Operational Hub & Shortcuts</h3>
+                  <span className="section-subtitle-tag">Fast Navigation</span>
+                </div>
+
                 <div className="admin-quick-actions">
-                  <button type="button" onClick={() => changeView('analytics')}>
-                    <span className="action-icon-wrap">
-                      <ChartNoAxesCombined size={20} />
-                    </span>
-                    <div className="action-text-wrap">
-                      <strong>Admin Analytics</strong>
-                      <small>Live metrics, bottlenecks & domain trends</small>
+                  <button
+                    type="button"
+                    className="shortcut-card accent-indigo"
+                    onClick={() => changeView('analytics')}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">LIVE METRICS</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap indigo">
+                        <ChartNoAxesCombined size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Admin Analytics</strong>
+                        <small>Live throughput, SLA trends & track distribution</small>
+                      </div>
                     </div>
                   </button>
 
-                  <button type="button" onClick={() => changeView('interns')}>
-                    <span className="action-icon-wrap">
-                      <Users size={20} />
-                    </span>
-                    <div className="action-text-wrap">
-                      <strong>Intern Directory</strong>
-                      <small>Manage interns & team assignments</small>
+                  <button
+                    type="button"
+                    className="shortcut-card accent-emerald"
+                    onClick={() => changeView('interns')}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">DIRECTORY</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap emerald">
+                        <Users size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Intern Management</strong>
+                        <small>Search cohort rosters, assign TLs & review status</small>
+                      </div>
                     </div>
                   </button>
 
-                  <button type="button" onClick={() => changeView('teamleaders')}>
-                    <span className="action-icon-wrap">
-                      <Briefcase size={20} />
-                    </span>
-                    <div className="action-text-wrap">
-                      <strong>Team Leaders</strong>
-                      <small>Review leader workload & intern rosters</small>
+                  <button
+                    type="button"
+                    className="shortcut-card accent-cyan"
+                    onClick={() => changeView('teamleaders')}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">OVERSIGHT</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap cyan">
+                        <Briefcase size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Team Leaders</strong>
+                        <small>Monitor leader workload & assigned intern groups</small>
+                      </div>
                     </div>
                   </button>
 
-                  <button type="button" onClick={() => changeView('intern')}>
-                    <span className="action-icon-wrap">
-                      <UserPlus size={20} />
-                    </span>
-                    <div className="action-text-wrap">
-                      <strong>Create Intern</strong>
-                      <small>Register and provision a new intern profile</small>
+                  <button
+                    type="button"
+                    className="shortcut-card accent-amber"
+                    onClick={() => changeView('requests')}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">ACTION QUEUE</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap amber">
+                        <Inbox size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Certificate Requests</strong>
+                        <small>Review forwarded requests & issue credentials</small>
+                      </div>
                     </div>
                   </button>
 
-                  <button type="button" onClick={() => changeView('teamleader')}>
-                    <span className="action-icon-wrap">
-                      <UserCheck size={20} />
-                    </span>
-                    <div className="action-text-wrap">
-                      <strong>Create Team Leader</strong>
-                      <small>Onboard a manager with intern oversight</small>
+                  <button
+                    type="button"
+                    className="shortcut-card accent-purple"
+                    onClick={() => changeView('intern')}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">PROVISIONING</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap purple">
+                        <UserPlus size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Create Intern</strong>
+                        <small>Register and provision a new intern profile</small>
+                      </div>
                     </div>
                   </button>
 
-                  <button type="button" onClick={openCertificateTemplates}>
-                    <span className="action-icon-wrap">
-                      <ScrollText size={20} />
-                    </span>
-                    <div className="action-text-wrap">
-                      <strong>Certificate Templates</strong>
-                      <small>Design credentials via visual HTML builder</small>
+                  <button
+                    type="button"
+                    className="shortcut-card accent-teal"
+                    onClick={() => changeView('certificates')}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">LEDGER</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap teal">
+                        <Award size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Issued Certificates</strong>
+                        <small>Verify serials, download PDFs & audit credentials</small>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="shortcut-card accent-orange"
+                    onClick={openCertificateTemplates}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">STUDIO</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap orange">
+                        <ScrollText size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Certificate Templates</strong>
+                        <small>Visual HTML template designer & live preview</small>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="shortcut-card accent-slate"
+                    onClick={() => changeView('audit')}
+                  >
+                    <div className="shortcut-card-top">
+                      <span className="shortcut-tag">SECURITY</span>
+                      <ArrowUpRight size={15} className="shortcut-arrow" />
+                    </div>
+                    <div className="shortcut-card-body">
+                      <span className="action-icon-wrap slate">
+                        <ShieldCheck size={20} />
+                      </span>
+                      <div className="action-text-wrap">
+                        <strong>Security & Audit</strong>
+                        <small>Tamper-evident logs, actor tracing & compliance</small>
+                      </div>
                     </div>
                   </button>
                 </div>

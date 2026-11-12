@@ -71,3 +71,4 @@ export default function BrandLogo({ size = 'medium', collapsed = false, subtitle
     </div>
   );
 }
+
