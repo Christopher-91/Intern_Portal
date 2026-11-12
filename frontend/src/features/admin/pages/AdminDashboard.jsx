@@ -511,7 +511,7 @@ const AdminDashboard = () => {
                     onClick={() => changeView('analytics')}
                   >
                     <div className="shortcut-card-top">
-                      <span className="shortcut-tag">LIVE METRICS</span>
+                      <span className="shortcut-tag">METRICS</span>
                       <ArrowUpRight size={15} className="shortcut-arrow" />
                     </div>
                     <div className="shortcut-card-body">

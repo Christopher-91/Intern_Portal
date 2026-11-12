@@ -1,224 +1,140 @@
+/* ==========================================================================
+   Upcoming Completions — Team Leader view
+   ========================================================================== */
+
 .upcoming-completions-card {
-  max-width: 1080px;
-  margin: 24px auto 0;
-  padding: 24px;
+  padding: 24px 28px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   color: var(--text);
-  box-shadow: 0 18px 45px var(--shadow);
+  box-shadow: var(--shadow-sm);
+  margin-top: 24px;
 }
 
 .upcoming-completions-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
 }
 
 .upcoming-completions-header h2 {
-  margin: 4px 0 6px;
-  font-size: 22px;
+  margin: 0 0 3px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .upcoming-completions-header > div:first-child p:last-child {
   margin: 0;
   color: var(--muted);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13px;
 }
 
 .upcoming-count {
-  min-width: 42px;
-  height: 42px;
-  padding: 0 12px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  color: var(--accent);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  font-weight: 700;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .upcoming-completions-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .upcoming-completion-item {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px;
-  background: var(--input);
+  padding: 14px 16px;
+  background: var(--page);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease;
 }
 
 .upcoming-completion-item:hover {
-  transform: translateY(-1px);
-  border-color: var(--accent);
-  box-shadow: 0 8px 20px var(--shadow);
+  border-color: var(--border-strong);
 }
 
-.upcoming-intern-avatar {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 48px;
-  border-radius: 14px;
-  background: linear-gradient(
-    135deg,
-    var(--accent-1),
-    var(--accent-2)
-  );
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.upcoming-intern-info {
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.upcoming-intern-info strong {
-  color: var(--text);
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.upcoming-intern-info span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.upcoming-intern-info small {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.upcoming-completion-date {
-  min-width: 130px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-  text-align: right;
-}
-
-.upcoming-completion-date strong {
-  color: #f59e0b;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.upcoming-completion-date span {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.upcoming-empty-state {
-  min-height: 110px;
-  border: 1px dashed var(--border);
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 20px;
-  color: var(--muted);
-  background: var(--input);
-}
-
-.upcoming-empty-state span {
-  width: 32px;
-  height: 32px;
+.completion-avatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in srgb, var(--success) 14%, transparent);
-  color: var(--success);
+  background: var(--primary-light);
+  color: var(--primary);
+  display: grid;
+  place-items: center;
   font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
 }
 
-.upcoming-empty-state p {
-  margin: 0;
+.completion-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.completion-info h3 {
+  margin: 0 0 2px;
   font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
 }
 
-/* Responsive */
-@media (max-width: 850px) {
-  .upcoming-completions-card {
-    padding: 20px;
-  }
+.completion-info p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 
-@media (max-width: 700px) {
-  .upcoming-completions-card {
-    padding: 18px;
-  }
-
-  .upcoming-completion-item {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .upcoming-intern-info {
-    flex: 1;
-    min-width: 150px;
-  }
-
-  .upcoming-completion-date {
-    width: 100%;
-    padding-left: 64px;
-    align-items: flex-start;
-    text-align: left;
-  }
+.completion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-@media (max-width: 480px) {
-  .upcoming-completions-header {
-    align-items: flex-start;
-  }
+.completion-badge.urgent {
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-border);
+}
 
-  .upcoming-completions-header h2 {
-    font-size: 20px;
-  }
+.completion-badge.soon {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
 
-  .upcoming-count {
-    min-width: 36px;
-    height: 36px;
-  }
+.completion-badge.normal {
+  background: var(--subtle-bg);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
 
-  .upcoming-completion-item {
-    padding: 14px;
-  }
-
-  .upcoming-intern-avatar {
-    width: 42px;
-    height: 42px;
-    flex-basis: 42px;
-  }
-
-  .upcoming-completion-date {
-    padding-left: 56px;
-  }
+.upcoming-empty {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  background: var(--page);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
 }

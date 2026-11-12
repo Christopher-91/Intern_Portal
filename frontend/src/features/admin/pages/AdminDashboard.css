@@ -296,10 +296,7 @@
 .admin-dashboard-main {
   min-width: 0;
   overflow-y: auto;
-  padding: 32px 40px 60px;
-  max-width: 1320px;
-  margin: 0 auto;
-  width: 100%;
+  padding: 32px 36px 60px;
 }
 
 .admin-page-header {

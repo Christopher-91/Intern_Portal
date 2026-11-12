@@ -71,6 +71,40 @@
 
   /* Focus ring */
   --focus-ring: 0 0 0 3px rgba(79, 70, 229, 0.2);
+
+  /* =========================================================
+     ALIAS TOKENS — bridge between Admin CSS token names
+     and the global design system above
+     ========================================================= */
+
+  /* Typography aliases */
+  --text-primary: #111827;
+  --text-muted: #6b7280;
+  --text-tertiary: #9ca3af;
+
+  /* Background aliases */
+  --bg-page: #f8f9fc;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f3f4f8;
+
+  /* Border aliases */
+  --border-subtle: #e5e7eb;
+  --border-default: #d1d5db;
+
+  /* Color aliases */
+  --color-primary: #4f46e5;
+  --color-primary-dark: #4338ca;
+  --color-primary-light: #eef2ff;
+  --color-success: #059669;
+  --color-success-light: #ecfdf5;
+  --color-warning: #d97706;
+  --color-warning-light: #fffbeb;
+  --color-error: #dc2626;
+  --color-error-light: #fef2f2;
+
+  /* Font & transition aliases */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --transition-fast: 0.15s ease;
 }
 
 :root[data-theme='dark'] {
@@ -124,6 +158,25 @@
   --shadow: var(--shadow-md);
 
   --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.3);
+
+  /* Dark-mode alias overrides */
+  --text-primary: #f9fafb;
+  --text-muted: #94a3b8;
+  --text-tertiary: #64748b;
+  --bg-page: #0b0f19;
+  --bg-surface: #111827;
+  --bg-surface-hover: #1a2337;
+  --border-subtle: #26324a;
+  --border-default: #334155;
+  --color-primary: #6366f1;
+  --color-primary-dark: #818cf8;
+  --color-primary-light: rgba(99, 102, 241, 0.16);
+  --color-success: #10b981;
+  --color-success-light: rgba(16, 185, 129, 0.12);
+  --color-warning: #f59e0b;
+  --color-warning-light: rgba(245, 158, 11, 0.12);
+  --color-error: #ef4444;
+  --color-error-light: rgba(239, 68, 68, 0.12);
 }
 
 :root[data-theme='dark'] input[type='date'] {
