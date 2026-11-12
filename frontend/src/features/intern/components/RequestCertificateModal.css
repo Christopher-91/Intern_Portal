@@ -1,17 +1,214 @@
-.request-modal-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(10, 10, 25, .65); backdrop-filter: blur(5px); }
-.request-modal { width: min(100%, 500px); padding: 28px; border: 1px solid var(--border); border-radius: 18px; color: var(--text); background: var(--card); box-shadow: 0 24px 70px rgba(0, 0, 0, .35); }
-.request-modal-header, .certificate-actions, .requests-panel-heading, .review-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.request-modal-header { margin-bottom: 24px; }
-.request-eyebrow { margin: 0 0 7px; color: var(--accent); font-size: 11px; font-weight: 900; letter-spacing: 1.3px; }
-.request-modal h2, .requests-panel h2, .review-panel h2, .certificate-actions h2 { margin: 0; font-size: 22px; }
-.request-close { border: 0; color: var(--muted); background: transparent; font-size: 26px; cursor: pointer; }
-.request-field { display: block; margin-bottom: 18px; color: var(--text); font-size: 13px; font-weight: 800; }
-.request-field select, .request-field input, .request-field textarea, .reject-form input { display: block; width: 100%; margin-top: 8px; padding: 11px 12px; border: 1px solid var(--border); border-radius: 9px; outline: 0; color: var(--text); background: var(--input); font: inherit; font-weight: 400; }
-.request-field textarea { resize: vertical; }
-.request-metadata-section { margin-top: 12px; margin-bottom: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
-.request-metadata-title { font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 10px; }
-.request-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.request-submit, .request-primary-button { padding: 11px 16px; border: 0; border-radius: 9px; color: #fff; background: var(--accent); font-weight: 800; cursor: pointer; }
-.request-submit { width: 100%; }
-.request-submit:disabled, .review-actions button:disabled { opacity: .6; cursor: wait; }
-.request-inline-error, .requests-error { color: var(--error); margin-bottom: 14px; font-size: 13px; }
+/* ==========================================================================
+   Request Certificate Modal
+   Linear / Stripe / Vercel Aesthetic
+   ========================================================================== */
+
+.request-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.request-modal {
+  width: min(100%, 540px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  color: var(--text);
+  background: var(--card);
+  box-shadow: var(--shadow-xl);
+  animation: modalScaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.request-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.request-modal-header h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.request-close {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.request-close:hover {
+  color: var(--text);
+  background: var(--subtle-bg);
+  border-color: var(--border-strong);
+}
+
+.request-field {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.request-field > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.request-field select,
+.request-field input,
+.request-field textarea {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  outline: 0;
+  color: var(--text);
+  background: var(--input);
+  font-family: inherit;
+  font-size: 13.5px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.request-field select:focus,
+.request-field input:focus,
+.request-field textarea:focus {
+  border-color: var(--primary);
+  box-shadow: var(--focus-ring);
+}
+
+.request-field textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+.request-metadata-section {
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.request-metadata-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 12px;
+}
+
+.request-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.request-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 20px;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  background: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.request-submit:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.request-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-btn-sm {
+  padding: 8px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.admin-btn-sm:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--subtle-bg);
+}
+
+.request-inline-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error);
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 580px) {
+  .request-modal {
+    padding: 20px 18px;
+  }
+
+  .request-field-row {
+    grid-template-columns: 1fr;
+  }
+}
