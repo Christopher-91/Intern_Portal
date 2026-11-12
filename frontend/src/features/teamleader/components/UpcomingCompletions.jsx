@@ -1,17 +1,19 @@
-﻿import './UpcomingCompletions.css';
+import { CheckCircle2, Clock, Calendar } from 'lucide-react';
+import './UpcomingCompletions.css';
+
 const UpcomingCompletions = ({ interns }) => {
   if (!interns || interns.length === 0) {
     return (
       <section className="upcoming-completions-card">
         <div className="upcoming-completions-header">
           <div>
-            <p className="admin-eyebrow">CERTIFICATE PREPARATION</p>
-            <h2>Upcoming Completions</h2>
+            <h2>Upcoming Cohort Completions</h2>
+            <p>Cohort completions occurring within the next 72 hours.</p>
           </div>
         </div>
 
         <div className="upcoming-empty-state">
-          <span>✓</span>
+          <CheckCircle2 size={18} style={{ color: '#10B981' }} />
           <p>No interns are completing their internship within the next 3 days.</p>
         </div>
       </section>
@@ -22,16 +24,15 @@ const UpcomingCompletions = ({ interns }) => {
     <section className="upcoming-completions-card">
       <div className="upcoming-completions-header">
         <div>
-          <p className="admin-eyebrow">CERTIFICATE PREPARATION</p>
-          <h2>Upcoming Completions</h2>
+          <h2>Upcoming Cohort Completions</h2>
           <p>
             These interns are completing their internship within the next 3 days.
-            Prepare their certificates in advance.
-            </p>
+            Review and forward their certificates in advance.
+          </p>
         </div>
 
         <div className="upcoming-count">
-          {interns.length}
+          {interns.length} {interns.length === 1 ? 'intern' : 'interns'}
         </div>
       </div>
 

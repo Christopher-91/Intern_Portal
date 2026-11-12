@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/useAuth';
 import useNotifications from '../hooks/useNotifications';
 import { getNotificationDestination } from '../utils/notificationDestination';
+import { Bell, RefreshCw, CheckCheck, X } from 'lucide-react';
 import './NotificationBell.css';
 
 export default function NotificationBell() {
@@ -56,21 +57,105 @@ export default function NotificationBell() {
     navigate(getNotificationDestination(notification, user?.role));
   };
 
-  return <div className="notification-bell">
-    <button ref={triggerRef} className="notification-bell-trigger" type="button" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`} aria-haspopup="dialog" aria-controls="notification-popover" aria-expanded={open} onClick={() => { setOpen((value) => !value); if (!open) refresh(); }}>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
-      {unreadCount > 0 && <span className="notification-bell-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
-    </button>
-    {toastMessage && <div className="notification-toast" role="status" aria-live="polite"><span>{toastMessage}</span><button type="button" aria-label="Dismiss notification message" onClick={() => setToastMessage('')}>Dismiss</button></div>}
-    {open && <section ref={popoverRef} id="notification-popover" className="notification-popover" role="dialog" aria-modal="false" aria-label="Notifications">
-      <header><div><strong>Notifications</strong><small>{unreadCount} unread</small></div><div className="notification-popover-actions"><button type="button" onClick={refresh} aria-label="Refresh notifications">Refresh</button><button type="button" disabled={!unreadCount} onClick={markAllRead}>Mark all read</button></div></header>
-      {error && <p className="notification-error" role="alert">{error}</p>}
-      <div className="notification-list">
-        {notifications.length ? notifications.map((notification) => <button className={`notification-item ${notification.isRead ? 'is-read' : 'is-unread'}`} type="button" key={notification._id} onClick={() => openNotification(notification)}>
-          <span className="notification-item-dot" aria-hidden="true" />
-          <span className="notification-item-content"><strong>{notification.title}</strong><span>{notification.message}</span><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleString()}</time></span>
-        </button>) : <p className="notification-empty">No notifications yet.</p>}
-      </div>
-    </section>}
-  </div>;
+  return (
+    <div className="notification-bell">
+      <button
+        ref={triggerRef}
+        className="notification-bell-trigger"
+        type="button"
+        aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}
+        aria-haspopup="dialog"
+        aria-controls="notification-popover"
+        aria-expanded={open}
+        onClick={() => {
+          setOpen((value) => !value);
+          if (!open) refresh();
+        }}
+      >
+        <Bell size={18} />
+        {unreadCount > 0 && (
+          <span className="notification-bell-badge">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {toastMessage && (
+        <div className="notification-toast" role="status" aria-live="polite">
+          <span>{toastMessage}</span>
+          <button
+            type="button"
+            aria-label="Dismiss notification message"
+            onClick={() => setToastMessage('')}
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
+
+      {open && (
+        <section
+          ref={popoverRef}
+          id="notification-popover"
+          className="notification-popover"
+          role="dialog"
+          aria-modal="false"
+          aria-label="Notifications"
+        >
+          <header>
+            <div>
+              <strong>Notifications</strong>
+              <small>{unreadCount} unread</small>
+            </div>
+            <div className="notification-popover-actions">
+              <button
+                type="button"
+                onClick={refresh}
+                aria-label="Refresh notifications"
+                title="Refresh notifications"
+              >
+                <RefreshCw size={12} />
+                <span>Refresh</span>
+              </button>
+              <button
+                type="button"
+                disabled={!unreadCount}
+                onClick={markAllRead}
+                title="Mark all notifications as read"
+              >
+                <CheckCheck size={12} />
+                <span>Mark all read</span>
+              </button>
+            </div>
+          </header>
+
+          {error && <p className="notification-error" role="alert">{error}</p>}
+
+          <div className="notification-list">
+            {notifications.length ? (
+              notifications.map((notification) => (
+                <button
+                  className={`notification-item ${notification.isRead ? 'is-read' : 'is-unread'}`}
+                  type="button"
+                  key={notification._id}
+                  onClick={() => openNotification(notification)}
+                >
+                  <span className="notification-item-dot" aria-hidden="true" />
+                  <span className="notification-item-content">
+                    <strong>{notification.title}</strong>
+                    <span>{notification.message}</span>
+                    <time dateTime={notification.createdAt}>
+                      {new Date(notification.createdAt).toLocaleString()}
+                    </time>
+                  </span>
+                </button>
+              ))
+            ) : (
+              <p className="notification-empty">No notifications yet.</p>
+            )}
+          </div>
+        </section>
+      )}
+    </div>
+  );
 }

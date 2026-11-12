@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { FileText } from 'lucide-react';
 import './CertificatePreview.css';
 
 /**
@@ -59,7 +60,7 @@ export default function CertificatePreview({ htmlContent = '' }) {
         ) : (
           <div className="certificate-preview-empty" role="status">
             <div className="certificate-preview-empty-icon" aria-hidden="true">
-              <span>▤</span>
+              <FileText size={28} />
             </div>
             <h3>No Certificate Content</h3>
             <p>The certificate template is currently empty. Edit the HTML in the editor panel to view the live preview.</p>

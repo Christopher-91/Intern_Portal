@@ -3,9 +3,17 @@ import useCertificateRequests from '../hooks/useCertificateRequests';
 import StatusBadge from '../../shared/components/StatusBadge';
 import Toast from '../../../shared/components/Toast';
 import { getCertificateForRequest, downloadCertificatePdf } from '../services/intern.service';
+import { Download, RefreshCw, AlertCircle, FileCheck, Award, Clock } from 'lucide-react';
 import './MyRequestsList.css';
 
-const formatDate = (date) => date ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+const formatDate = (date) =>
+  date
+    ? new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : '—';
 
 export default function MyRequestsList() {
   const { requests, loading, error, refetch } = useCertificateRequests();
@@ -48,10 +56,15 @@ export default function MyRequestsList() {
     <section className="requests-panel" aria-labelledby="my-requests-title">
       <div className="requests-panel-heading">
         <div>
-          <p className="request-eyebrow">REQUEST HISTORY</p>
-          <h2 id="my-requests-title">My certificate requests</h2>
+          <h2 id="my-requests-title">Certificate Request History</h2>
+          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '13px' }}>
+            Track approvals by your Team Leader and Administration.
+          </p>
         </div>
-        <button className="requests-refresh" type="button" onClick={refetch}>Refresh</button>
+        <button className="requests-refresh" type="button" onClick={refetch} disabled={loading}>
+          <RefreshCw size={13} className={loading ? 'spin' : ''} />
+          <span>Refresh</span>
+        </button>
       </div>
 
       {downloadSuccess && (
@@ -66,19 +79,37 @@ export default function MyRequestsList() {
         </div>
       )}
 
-      {loading && <p className="requests-state">Loading requests…</p>}
-      {!loading && error && <p className="requests-state requests-error" role="alert">{error}</p>}
-      {!loading && !error && !requests.length && <p className="requests-state">No requests yet</p>}
+      {loading && (
+        <div className="requests-state">
+          <div className="spinner" aria-hidden="true" />
+          <span>Loading certificate requests…</span>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="requests-state requests-error" role="alert">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {!loading && !error && !requests.length && (
+        <div className="requests-state">
+          <Award size={20} style={{ color: 'var(--text-muted)' }} />
+          <span>You haven&apos;t submitted any certificate requests yet.</span>
+        </div>
+      )}
+
       {!loading && !error && requests.length > 0 && (
         <div className="requests-table-wrap">
           <table className="requests-table">
             <thead>
               <tr>
-                <th>Request</th>
-                <th>Certificate</th>
+                <th>Request ID</th>
+                <th>Certificate Type</th>
                 <th>Status</th>
-                <th>Requested</th>
-                <th>Action</th>
+                <th>Requested Date</th>
+                <th>Official Credential</th>
               </tr>
             </thead>
             <tbody>
@@ -89,9 +120,15 @@ export default function MyRequestsList() {
 
                 return (
                   <tr key={id}>
-                    <td>{request.requestNumber || '—'}</td>
-                    <td>{request.certificateType?.replaceAll('_', ' ') || '—'}</td>
-                    <td><StatusBadge status={request.status} /></td>
+                    <td>
+                      <code>{request.requestNumber || '—'}</code>
+                    </td>
+                    <td>
+                      <strong>{request.certificateType?.replaceAll('_', ' ') || '—'}</strong>
+                    </td>
+                    <td>
+                      <StatusBadge status={request.status} />
+                    </td>
                     <td>{formatDate(request.requestedAt || request.createdAt)}</td>
                     <td>
                       {isCompleted ? (
@@ -102,18 +139,13 @@ export default function MyRequestsList() {
                           disabled={isDownloading}
                           title="Download finalized certificate PDF"
                         >
-                          {isDownloading ? (
-                            <>
-                              <span className="download-spinner" aria-hidden="true" />
-                              <span>Downloading…</span>
-                            </>
-                          ) : (
-                            <span>📥 Download Certificate</span>
-                          )}
+                          <Download size={13} />
+                          <span>{isDownloading ? 'Downloading…' : 'Download PDF'}</span>
                         </button>
                       ) : (
                         <span className="request-action-disabled" title="Available once finalized by admin">
-                          —
+                          <Clock size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                          Awaiting Completion
                         </span>
                       )}
                     </td>
@@ -126,4 +158,4 @@ export default function MyRequestsList() {
       )}
     </section>
   );
-}
+}

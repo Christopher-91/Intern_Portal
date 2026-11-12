@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useTeamLeaders from '../hooks/useTeamLeaders';
 import { updateTeamLeader } from '../services/admin.service';
+import { Search, ChevronRight, Briefcase, Edit2, X, AlertCircle, CheckCircle2, Phone, Mail, Calendar } from 'lucide-react';
 import './TeamLeadersSection.css';
 
 export default function TeamLeaderList({ onSelect }) {
@@ -56,46 +57,60 @@ export default function TeamLeaderList({ onSelect }) {
     <section className="team-leaders-panel" aria-labelledby="team-leaders-title">
       <div className="team-leaders-heading">
         <div>
-          <p className="admin-eyebrow">PEOPLE DIRECTORY</p>
-          <h2 id="team-leaders-title">Team Leaders</h2>
-          <p>Select a team leader to view their assigned interns, or edit their details.</p>
+          <h2 id="team-leaders-title">Team Leader Roster</h2>
+          <p>Select a team leader to view their assigned interns, or edit management details.</p>
         </div>
-        {!loading && !error && <span className="team-leaders-count">{teamLeaders.length} total</span>}
+        {!loading && !error && (
+          <span className="team-leaders-count">
+            <Briefcase size={12} />
+            <span>{teamLeaders.length} active leaders</span>
+          </span>
+        )}
       </div>
 
-      <div style={{ marginBottom: '18px' }}>
+      <div className="tl-search-bar-wrap">
+        <Search size={15} className="tl-search-icon" />
         <input
           type="text"
-          placeholder="Search team leaders by name or email..."
+          className="tl-search-input"
+          placeholder="Search team leaders by name or email…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '10px 14px',
-            borderRadius: '10px',
-            border: '1px solid var(--border)',
-            background: 'var(--input)',
-            color: 'var(--text)',
-            fontSize: '14px',
-          }}
         />
+        {searchTerm && (
+          <button
+            type="button"
+            className="clear-search-btn"
+            onClick={() => setSearchTerm('')}
+            aria-label="Clear search"
+          >
+            <X size={12} />
+          </button>
+        )}
       </div>
 
       {loading && (
         <div className="team-leader-list" aria-label="Loading team leaders">
-          {[1, 2, 3].map((item) => <div className="team-leader-skeleton" key={item} />)}
+          {[1, 2, 3].map((item) => (
+            <div className="team-leader-skeleton" key={item} />
+          ))}
         </div>
       )}
 
       {!loading && error && (
         <div className="team-leaders-error" role="alert">
-          <span>{error}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
           <button type="button" onClick={refetch}>Retry</button>
         </div>
       )}
 
       {!loading && !error && filtered.length === 0 && (
-        <p className="team-leaders-state">No team leaders found</p>
+        <div className="team-leaders-state">
+          No team leaders found matching &quot;{searchTerm}&quot;
+        </div>
       )}
 
       {!loading && !error && filtered.length > 0 && (
@@ -109,18 +124,28 @@ export default function TeamLeaderList({ onSelect }) {
                 onClick={() => onSelect(id)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter') onSelect(id); }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') onSelect(id);
+                }}
               >
-                <span className="team-leader-avatar">{teamLeader.fullName?.charAt(0)?.toUpperCase() || 'T'}</span>
+                <span className="team-leader-avatar">
+                  {teamLeader.fullName?.charAt(0)?.toUpperCase() || 'T'}
+                </span>
+
                 <span className="team-leader-details">
                   <strong>{teamLeader.fullName}</strong>
                   <small>{teamLeader.email}</small>
-                  {teamLeader.mobileNo && <small style={{ color: 'var(--muted)' }}>{teamLeader.mobileNo}</small>}
+                  {teamLeader.mobileNo && (
+                    <small className="tl-mobile-text">{teamLeader.mobileNo}</small>
+                  )}
                 </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span className="team-leaders-count">
-                    {teamLeader.assignedInternCount || 0} intern{teamLeader.assignedInternCount === 1 ? '' : 's'}
+
+                <div className="team-leader-right-actions">
+                  <span className="team-leaders-intern-badge">
+                    {teamLeader.assignedInternCount || 0}{' '}
+                    {teamLeader.assignedInternCount === 1 ? 'intern' : 'interns'}
                   </span>
+
                   <button
                     type="button"
                     className="admin-btn-sm"
@@ -129,7 +154,8 @@ export default function TeamLeaderList({ onSelect }) {
                   >
                     Edit
                   </button>
-                  <span className="team-leader-arrow" aria-hidden="true">→</span>
+
+                  <ChevronRight size={16} className="team-leader-chevron" aria-hidden="true" />
                 </div>
               </div>
             );
@@ -141,12 +167,27 @@ export default function TeamLeaderList({ onSelect }) {
       {editingTl && (
         <div className="admin-modal-backdrop" role="dialog" aria-modal="true">
           <div className="admin-modal-card">
-            <h3>Edit Team Leader Details</h3>
-            <p>Update permitted profile fields for <strong>{editingTl.fullName}</strong> ({editingTl.email}).</p>
+            <div className="modal-header-row">
+              <div>
+                <h3>Edit Team Leader Details</h3>
+                <p>
+                  Update profile fields for <strong>{editingTl.fullName}</strong>.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setEditingTl(null)}
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
 
             {editMsg && (
               <div className={`admin-alert-box ${editMsg.type}`}>
-                {editMsg.text}
+                {editMsg.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{editMsg.text}</span>
               </div>
             )}
 
@@ -202,7 +243,7 @@ export default function TeamLeaderList({ onSelect }) {
                   className="admin-btn-sm admin-btn-primary-sm"
                   disabled={editLoading}
                 >
-                  {editLoading ? 'Saving...' : 'Save Changes'}
+                  {editLoading ? 'Saving…' : 'Save Changes'}
                 </button>
               </div>
             </form>

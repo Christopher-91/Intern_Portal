@@ -1,8 +1,22 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import BrandLogo from '../../shared/components/BrandLogo';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  ShieldCheck,
+  FileCheck2,
+  Users2,
+  ArrowRight,
+  Sparkles
+} from 'lucide-react';
 import '../../../app/App.css';
-
 
 const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -10,7 +24,6 @@ const validateEmail = (email) => {
 };
 
 export default function Login() {
-
   const [values, setValues] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -40,7 +53,7 @@ export default function Login() {
 
     if (name === 'email') {
       if (!value.trim()) {
-        setErrors((prev) => ({ ...prev, email: 'Email is required.' }));
+        setErrors((prev) => ({ ...prev, email: 'Email address is required.' }));
       } else if (!validateEmail(value)) {
         setErrors((prev) => ({ ...prev, email: 'Please enter a valid email address.' }));
       } else {
@@ -72,12 +85,10 @@ export default function Login() {
 
   const submit = async (event) => {
     event.preventDefault();
-
     setLoading(true);
 
     try {
       const data = await handleLogin(values.email.trim().toLowerCase(), values.password);
-
       setLoading(false);
       notify('success', 'Logged in successfully!');
 
@@ -93,85 +104,128 @@ export default function Login() {
   return (
     <div className="auth-page">
       {notification && (
-        <div className={`notification ${notification.type}`}>
-          <span className="notification-icon">{notification.type === 'error' ? '✖' : '✔'}</span>
+        <div className={`notification ${notification.type}`} role="status">
+          <span className="notification-icon">
+            {notification.type === 'error' ? <AlertCircle size={14} /> : <CheckCircle2 size={14} />}
+          </span>
           <span>{notification.message}</span>
-          <button className="close-btn" onClick={() => setNotification(null)}>×</button>
+          <button className="close-btn" type="button" onClick={() => setNotification(null)} aria-label="Dismiss">
+            <X size={15} />
+          </button>
         </div>
       )}
 
-      <div className="brand-panel">
-        <div className="brand">
-          <span className="brand-icon">🚀</span>
-          <strong>uptoskills</strong>
+      {/* Left Brand Showcase Panel */}
+      <aside className="brand-panel">
+        <div className="brand-panel-header">
+          <BrandLogo size="medium" subtitle="Enterprise" />
         </div>
 
-        <div className="brand-content">
-          <h1>Step up your career with <em>in-demand skills</em></h1>
-          <p>Everything you need to manage your internship journey in one secure place.</p>
+        <div className="brand-panel-body">
+          <div className="brand-panel-tag">
+            <Sparkles size={12} />
+            <span>Internship Management Suite</span>
+          </div>
 
-          <div className="feature-card">
-            <span>NEW PATHWAY</span>
-            <h2>AI-Powered Skill Assessments</h2>
-            <p>Get customized learning recommendations based on your current skill levels and career goals.</p>
+          <h1>
+            Automate internship lifecycle <span>& credentialing</span>
+          </h1>
+
+          <p>
+            A unified enterprise workspace for tracking intern cohorts, review workflows, role governance, and generating verifiable cryptographic certificates.
+          </p>
+
+          <div className="brand-feature-list">
+            <div className="brand-feature-item">
+              <ShieldCheck size={18} />
+              <span>Tamper-proof certificates with public QR verification</span>
+            </div>
+            <div className="brand-feature-item">
+              <FileCheck2 size={18} />
+              <span>Multi-tier review & approval pipelines</span>
+            </div>
+            <div className="brand-feature-item">
+              <Users2 size={18} />
+              <span>Dedicated dashboards for Interns, Team Leaders & Admins</span>
+            </div>
           </div>
         </div>
 
-        <small>Copyright © 2026 UptoSkills</small>
-      </div>
+        <div className="brand-panel-footer">
+          <span>&copy; {new Date().getFullYear()} UptoSkills Inc.</span>
+          <span>Enterprise Edition v2.4</span>
+        </div>
+      </aside>
 
-      <div className="form-side">
+      {/* Right Login Form Side */}
+      <main className="form-side">
         <div className="auth-card">
-          <h2>Welcome Back</h2>
-          <p className="sub">Sign in to access your assigned dashboard.</p>
+          <div className="auth-card-header">
+            <h2>Welcome back</h2>
+            <p className="sub">Enter your organization credentials to access your dashboard.</p>
+          </div>
 
           <form onSubmit={submit} noValidate>
             <label className="field">
-              <b>Email Address</b>
-              <div
-                className={`input-wrap ${isEmailInvalid ? 'invalid' : isEmailValid ? 'valid' : ''
-                  }`}
-              >
-                <span className="input-icon">✉️</span>
+              <span className="field-label">
+                <b>Email address</b>
+              </span>
+              <div className={`input-wrap ${isEmailInvalid ? 'invalid' : isEmailValid ? 'valid' : ''}`}>
+                <span className="input-icon">
+                  <Mail size={16} />
+                </span>
                 <input
                   type="email"
                   name="email"
-                  placeholder="e.g. intern@uptoskills.com"
+                  placeholder="name@uptoskills.com"
                   value={values.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  autoComplete="email"
+                  required
                 />
               </div>
               {isEmailInvalid && (
-                <span className="field-error">{errors.email}</span>
+                <span className="field-error">
+                  <AlertCircle size={12} /> {errors.email}
+                </span>
               )}
             </label>
 
             <label className="field">
-              <b>Password</b>
-              <div
-                className={`input-wrap ${isPasswordInvalid ? 'invalid' : isPasswordValid ? 'valid' : ''
-                  }`}
-              >
-                <span className="input-icon">🔒</span>
+              <span className="field-label">
+                <b>Password</b>
+                <Link className="auth-link" to="/forgot-password" style={{ margin: 0, fontSize: '12px' }}>
+                  Forgot password?
+                </Link>
+              </span>
+              <div className={`input-wrap ${isPasswordInvalid ? 'invalid' : isPasswordValid ? 'valid' : ''}`}>
+                <span className="input-icon">
+                  <Lock size={16} />
+                </span>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="••••••••••••"
                   value={values.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  autoComplete="current-password"
+                  required
                 />
                 <button
                   type="button"
                   className="eye"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? '👁️' : '🙈'}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {isPasswordInvalid && (
-                <span className="field-error">{errors.password}</span>
+                <span className="field-error">
+                  <AlertCircle size={12} /> {errors.password}
+                </span>
               )}
             </label>
 
@@ -179,15 +233,20 @@ export default function Login() {
               type="submit"
               className="primary"
               disabled={loading}
-              style={{ marginTop: '16px' }}
+              style={{ marginTop: '18px' }}
             >
-              {loading ? <span className="spinner"></span> : 'Sign In'}
+              {loading ? (
+                <span className="spinner" aria-hidden="true" />
+              ) : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight size={15} />
+                </>
+              )}
             </button>
           </form>
-
-          <Link className="auth-link" to="/forgot-password">Forgot Password?</Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

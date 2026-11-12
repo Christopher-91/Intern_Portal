@@ -1,3 +1,4 @@
+import { CheckCircle2, AlertCircle, Info, Loader2, X } from 'lucide-react';
 import './Toast.css';
 
 /**
@@ -11,17 +12,24 @@ import './Toast.css';
 export default function Toast({ type = 'info', message, onClose }) {
   if (!message) return null;
 
-  const icons = {
-    success: '✓',
-    error: '✕',
-    info: 'ℹ',
-    loading: '⏳'
+  const renderIcon = () => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle2 size={16} className="shared-toast-svg" />;
+      case 'error':
+        return <AlertCircle size={16} className="shared-toast-svg" />;
+      case 'loading':
+        return <Loader2 size={16} className="shared-toast-svg spin" />;
+      case 'info':
+      default:
+        return <Info size={16} className="shared-toast-svg" />;
+    }
   };
 
   return (
     <div className={`shared-toast shared-toast-${type}`} role="alert" aria-live="polite">
       <span className="shared-toast-icon" aria-hidden="true">
-        {icons[type] || 'ℹ'}
+        {renderIcon()}
       </span>
       <span className="shared-toast-message">{message}</span>
       {onClose && (
@@ -31,7 +39,7 @@ export default function Toast({ type = 'info', message, onClose }) {
           onClick={onClose}
           aria-label="Dismiss message"
         >
-          ×
+          <X size={14} />
         </button>
       )}
     </div>

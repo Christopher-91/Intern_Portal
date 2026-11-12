@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllInterns, getAllTeamLeaders, assignInternTeamLeader, updateIntern } from '../services/admin.service';
 import AdminInternsTable from './AdminInternsTable';
+import { Search, Filter, Users, UserCheck, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import './AdminInternsList.css';
 
 export default function AdminInternsList() {
@@ -35,6 +36,7 @@ export default function AdminInternsList() {
   });
   const completingSoonIds = new Set(completingSoon.map((intern) => intern._id));
   const remainingInterns = interns.filter((intern) => !completingSoonIds.has(intern._id));
+
   const filterInterns = (rows, filters) => rows.filter((intern) => {
     const query = filters.search.trim().toLowerCase();
     const matchesSearch = !query || [intern.fullName, intern.email, intern.internCode, intern.domain]
@@ -44,17 +46,58 @@ export default function AdminInternsList() {
       intern.internshipDetails?.teamleaderEmail === filters.teamLeader;
     return matchesSearch && (!filters.status || intern.internshipDetails?.status === filters.status) && matchesLeader;
   });
+
   const filteredUpcoming = filterInterns(completingSoon, upcomingFilters);
   const filteredRemaining = filterInterns(remainingInterns, remainingFilters);
+
   const renderFilters = (filters, setFilters, label) => (
     <div className="admin-interns-toolbar" aria-label={`${label} filters`}>
-      <input type="text" className="admin-interns-search" placeholder="Search by name, email, intern code, or domain..." value={filters.search} onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))} />
-      <select className="admin-interns-filter" aria-label={`${label} status`} value={filters.status} onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))}>
-        <option value="">All Statuses</option><option value="upcoming">Upcoming</option><option value="ongoing">Ongoing</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+      <div className="search-input-wrap">
+        <Search size={15} className="search-icon" />
+        <input
+          type="text"
+          className="admin-interns-search"
+          placeholder="Search by name, email, code, domain…"
+          value={filters.search}
+          onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
+        />
+        {filters.search && (
+          <button
+            type="button"
+            className="clear-search-btn"
+            onClick={() => setFilters((current) => ({ ...current, search: '' }))}
+            aria-label="Clear search"
+          >
+            <X size={12} />
+          </button>
+        )}
+      </div>
+
+      <select
+        className="admin-interns-filter"
+        aria-label={`${label} status`}
+        value={filters.status}
+        onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))}
+      >
+        <option value="">All Statuses</option>
+        <option value="upcoming">Upcoming</option>
+        <option value="ongoing">Ongoing</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
       </select>
-      <select className="admin-interns-filter" aria-label={`${label} team leader`} value={filters.teamLeader} onChange={(event) => setFilters((current) => ({ ...current, teamLeader: event.target.value }))}>
+
+      <select
+        className="admin-interns-filter"
+        aria-label={`${label} team leader`}
+        value={filters.teamLeader}
+        onChange={(event) => setFilters((current) => ({ ...current, teamLeader: event.target.value }))}
+      >
         <option value="">All Team Leaders</option>
-        {teamLeaders.map((tl) => <option key={tl._id} value={tl._id}>{tl.fullName} ({tl.email})</option>)}
+        {teamLeaders.map((tl) => (
+          <option key={tl._id} value={tl._id}>
+            {tl.fullName} ({tl.email})
+          </option>
+        ))}
       </select>
     </div>
   );
@@ -157,36 +200,46 @@ export default function AdminInternsList() {
     <section className="admin-interns-panel" aria-labelledby="admin-interns-title">
       <div className="admin-interns-header">
         <div>
-          <p className="admin-eyebrow">PORTAL DIRECTORY</p>
-          <h2 id="admin-interns-title">Intern Management</h2>
+          <h2 id="admin-interns-title">Intern Directory</h2>
           <p>Full administrative oversight across all interns and Team Leader assignments.</p>
         </div>
-        <span className="team-leaders-count">{interns.length} total interns</span>
+        <span className="interns-total-badge">
+          <Users size={13} />
+          <span>{interns.length} total interns</span>
+        </span>
       </div>
 
       {loading && (
-        <div className="team-leader-list" style={{ marginTop: '20px' }}>
+        <div className="admin-interns-skeleton-wrap">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="team-leader-skeleton" />
+            <div key={i} className="intern-row-skeleton" />
           ))}
         </div>
       )}
 
       {!loading && error && (
         <div className="admin-alert-box error" role="alert">
-          {error}
+          <AlertCircle size={16} />
+          <span>{error}</span>
         </div>
       )}
 
       {!loading && !error && (
         <>
           <section className="admin-interns-group" aria-label="Interns completing soon">
-            <h3>Completing in the next 3 days <span>({filteredUpcoming.length})</span></h3>
+            <div className="group-heading-row">
+              <h3>Completing in the next 3 days</h3>
+              <span className="group-count-pill">{filteredUpcoming.length}</span>
+            </div>
             {renderFilters(upcomingFilters, setUpcomingFilters, 'Completing soon')}
             <AdminInternsTable interns={filteredUpcoming} onEdit={openEditModal} onAssign={openAssignModal} />
           </section>
+
           <section className="admin-interns-group" aria-label="All remaining interns">
-            <h3>All remaining interns <span>({filteredRemaining.length})</span></h3>
+            <div className="group-heading-row">
+              <h3>All Remaining Interns</h3>
+              <span className="group-count-pill">{filteredRemaining.length}</span>
+            </div>
             {renderFilters(remainingFilters, setRemainingFilters, 'Remaining interns')}
             <AdminInternsTable interns={filteredRemaining} onEdit={openEditModal} onAssign={openAssignModal} />
           </section>
@@ -197,22 +250,34 @@ export default function AdminInternsList() {
       {assigningIntern && (
         <div className="admin-modal-backdrop" role="dialog" aria-modal="true">
           <div className="admin-modal-card">
-            <h3>Assign Team Leader</h3>
-            <p>
-              Reassign <strong>{assigningIntern.fullName}</strong> to a verified Team Leader.
-              The new Team Leader will immediately gain management access.
-            </p>
+            <div className="modal-header-row">
+              <div>
+                <h3>Assign Team Leader</h3>
+                <p>
+                  Reassign <strong>{assigningIntern.fullName}</strong> to a verified Team Leader.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setAssigningIntern(null)}
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
 
             {assignMsg && (
               <div className={`admin-alert-box ${assignMsg.type}`}>
-                {assignMsg.text}
+                {assignMsg.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{assignMsg.text}</span>
               </div>
             )}
 
             <form onSubmit={handleAssignSave}>
               <div className="admin-form-group" style={{ marginBottom: '16px' }}>
                 <label>Current Assigned Team Leader</label>
-                <div style={{ padding: '8px 12px', background: 'var(--input)', borderRadius: '8px', fontSize: '13px' }}>
+                <div className="read-only-field">
                   {assigningIntern.internshipDetails?.teamLeader?.fullName ||
                     assigningIntern.internshipDetails?.teamleaderEmail ||
                     'None (Unassigned)'}
@@ -250,7 +315,7 @@ export default function AdminInternsList() {
                   className="admin-btn-sm admin-btn-primary-sm"
                   disabled={assignLoading}
                 >
-                  {assignLoading ? 'Saving...' : 'Confirm Assignment'}
+                  {assignLoading ? 'Saving…' : 'Confirm Assignment'}
                 </button>
               </div>
             </form>
@@ -262,12 +327,25 @@ export default function AdminInternsList() {
       {editingIntern && (
         <div className="admin-modal-backdrop" role="dialog" aria-modal="true">
           <div className="admin-modal-card">
-            <h3>Edit Intern Profile</h3>
-            <p>Update permitted profile and internship details for <strong>{editingIntern.fullName}</strong>.</p>
+            <div className="modal-header-row">
+              <div>
+                <h3>Edit Intern Profile</h3>
+                <p>Update permitted profile details for <strong>{editingIntern.fullName}</strong>.</p>
+              </div>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setEditingIntern(null)}
+                aria-label="Close modal"
+              >
+                <X size={16} />
+              </button>
+            </div>
 
             {editMsg && (
               <div className={`admin-alert-box ${editMsg.type}`}>
-                {editMsg.text}
+                {editMsg.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{editMsg.text}</span>
               </div>
             )}
 
@@ -392,7 +470,7 @@ export default function AdminInternsList() {
                   className="admin-btn-sm admin-btn-primary-sm"
                   disabled={editLoading}
                 >
-                  {editLoading ? 'Saving...' : 'Save Changes'}
+                  {editLoading ? 'Saving…' : 'Save Changes'}
                 </button>
               </div>
             </form>

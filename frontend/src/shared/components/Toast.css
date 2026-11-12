@@ -2,13 +2,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 18px;
-  border-radius: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
   font-size: 13px;
-  font-weight: 700;
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 25px var(--shadow);
-  animation: toastSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-weight: 500;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-md);
+  animation: toastSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   max-width: 100%;
 }
 
@@ -26,12 +26,20 @@
 .shared-toast-icon {
   display: inline-grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  font-size: 12px;
-  font-weight: 900;
   flex-shrink: 0;
+}
+
+.shared-toast-svg {
+  flex-shrink: 0;
+}
+
+.shared-toast-svg.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .shared-toast-message {
@@ -42,60 +50,42 @@
 .shared-toast-close {
   background: transparent;
   border: none;
-  font-size: 18px;
-  line-height: 1;
+  display: grid;
+  place-items: center;
   color: currentColor;
   opacity: 0.65;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
   transition: opacity 0.15s;
 }
 
 .shared-toast-close:hover {
   opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* Types */
+/* Status variants */
 .shared-toast-success {
-  background: color-mix(in srgb, #10b981 12%, var(--card));
-  color: #10b981;
-  border-color: color-mix(in srgb, #10b981 30%, transparent);
-}
-
-.shared-toast-success .shared-toast-icon {
-  background: #10b981;
-  color: #fff;
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 .shared-toast-error {
-  background: color-mix(in srgb, #ef4444 12%, var(--card));
-  color: #ef4444;
-  border-color: color-mix(in srgb, #ef4444 30%, transparent);
-}
-
-.shared-toast-error .shared-toast-icon {
-  background: #ef4444;
-  color: #fff;
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .shared-toast-info {
-  background: color-mix(in srgb, var(--accent) 12%, var(--card));
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
-}
-
-.shared-toast-info .shared-toast-icon {
-  background: var(--accent);
-  color: #fff;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-color: rgba(79, 70, 229, 0.3);
 }
 
 .shared-toast-loading {
-  background: color-mix(in srgb, var(--accent) 10%, var(--card));
-  color: var(--text);
-  border-color: var(--border);
-}
-
-.shared-toast-loading .shared-toast-icon {
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
-  color: var(--accent);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-default);
 }

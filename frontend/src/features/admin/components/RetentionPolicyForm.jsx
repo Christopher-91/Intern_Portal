@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Toast from '../../../shared/components/Toast';
 import { getRetentionPolicy, updateRetentionPolicy } from '../services/admin.service';
+import { Clock, Shield, Save, AlertCircle, RefreshCw } from 'lucide-react';
 import './RetentionManagement.css';
 
 export default function RetentionPolicyForm() {
@@ -40,7 +41,7 @@ export default function RetentionPolicyForm() {
     try {
       const result = await updateRetentionPolicy({ graceDays, purgeDays });
       setPolicy({ graceDays: result.policy.graceDays, purgeDays: result.policy.purgeDays });
-      setToast({ type: 'success', message: 'Retention policy saved.' });
+      setToast({ type: 'success', message: 'Retention policy saved successfully.' });
     } catch (requestError) {
       setToast({ type: 'error', message: requestError.message || 'Unable to save retention policy.' });
     } finally {
@@ -51,24 +52,49 @@ export default function RetentionPolicyForm() {
   return (
     <form className="retention-policy-card" onSubmit={save}>
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
-      <div>
-        <p className="admin-eyebrow">ACCOUNT LIFECYCLE</p>
-        <h2>Retention policy</h2>
-        <p>Interns can sign in during the grace period. Archived accounts are anonymized after the purge period; certificate records remain available.</p>
+      <div className="retention-header-block">
+        <h2>Data Retention & Lifecycle Policy</h2>
+        <p>
+          Interns can sign in during the grace period. Archived accounts are anonymized after the purge period; certificate credentials and verification hashes remain permanently accessible.
+        </p>
       </div>
+
       {error ? (
         <div className="retention-state retention-error" role="alert">
-          <span>{error}</span><button type="button" onClick={refresh}>Retry</button>
+          <AlertCircle size={16} />
+          <span>{error}</span>
+          <button type="button" onClick={refresh} className="retention-btn-secondary">
+            Retry
+          </button>
         </div>
       ) : (
         <div className="retention-policy-fields">
-          <label>Grace period (days)
-            <input type="number" min="1" step="1" required value={policy.graceDays} onChange={(event) => setPolicy((current) => ({ ...current, graceDays: event.target.value }))} />
+          <label>
+            <span>Grace Period (Days)</span>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              required
+              value={policy.graceDays}
+              onChange={(event) => setPolicy((current) => ({ ...current, graceDays: event.target.value }))}
+            />
           </label>
-          <label>Purge after archival (days)
-            <input type="number" min={Number(policy.graceDays) + 1} step="1" required value={policy.purgeDays} onChange={(event) => setPolicy((current) => ({ ...current, purgeDays: event.target.value }))} />
+          <label>
+            <span>Purge After Archival (Days)</span>
+            <input
+              type="number"
+              min={Number(policy.graceDays) + 1}
+              step="1"
+              required
+              value={policy.purgeDays}
+              onChange={(event) => setPolicy((current) => ({ ...current, purgeDays: event.target.value }))}
+            />
           </label>
-          <button type="submit" disabled={saving || loading}>{loading ? 'Loading…' : saving ? 'Saving…' : 'Save policy'}</button>
+          <button type="submit" className="retention-save-btn" disabled={saving || loading}>
+            <Save size={14} />
+            <span>{loading ? 'Loading…' : saving ? 'Saving…' : 'Save Policy'}</span>
+          </button>
         </div>
       )}
     </form>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllCertificates, downloadAdminCertificate, revokeAdminCertificate, unrevokeAdminCertificate } from '../services/admin.service';
 import Toast from '../../../shared/components/Toast';
+import { Award, Download, RefreshCw, AlertCircle, ArrowRight, RotateCcw, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import './CertificatesOverview.css';
 
 const formatDate = (date) => {
@@ -78,13 +79,20 @@ export default function CertificatesOverview() {
   const handleRevoke = async (cert) => {
     const reason = window.prompt(`Enter the reason for revoking certificate ${cert.certificateNumber}:`);
     if (reason === null) return;
-    if (!reason.trim()) { setToast({ type: 'error', message: 'A revocation reason is required.' }); return; }
+    if (!reason.trim()) {
+      setToast({ type: 'error', message: 'A revocation reason is required.' });
+      return;
+    }
     setRevokingId(cert._id);
     try {
       const result = await revokeAdminCertificate(cert._id, reason.trim());
-      setCertificates((current) => current.map((item) => item._id === cert._id
-        ? { ...item, ...(result.certificate || {}), status: 'revoked' }
-        : item));
+      setCertificates((current) =>
+        current.map((item) =>
+          item._id === cert._id
+            ? { ...item, ...(result.certificate || {}), status: 'revoked' }
+            : item
+        )
+      );
       setToast({ type: 'success', message: `Certificate ${cert.certificateNumber} revoked.` });
     } catch (err) {
       setToast({ type: 'error', message: err.message || 'Unable to revoke certificate.' });
@@ -99,9 +107,13 @@ export default function CertificatesOverview() {
     setRevokingId(cert._id);
     try {
       const result = await unrevokeAdminCertificate(cert._id);
-      setCertificates((current) => current.map((item) => item._id === cert._id
-        ? { ...item, ...(result.certificate || {}), status: result.certificate?.status || 'issued' }
-        : item));
+      setCertificates((current) =>
+        current.map((item) =>
+          item._id === cert._id
+            ? { ...item, ...(result.certificate || {}), status: result.certificate?.status || 'issued' }
+            : item
+        )
+      );
       setToast({ type: 'success', message: `Certificate ${cert.certificateNumber} reinstated.` });
     } catch (err) {
       setToast({ type: 'error', message: err.message || 'Unable to reinstate certificate.' });
@@ -115,21 +127,24 @@ export default function CertificatesOverview() {
     <section className="certificates-overview-panel" aria-labelledby="cert-overview-title">
       <div className="certificates-overview-heading">
         <div>
-          <p className="admin-eyebrow">AUDIT & COMPLIANCE</p>
-          <h2 id="cert-overview-title">Issued Certificates Overview</h2>
+          <h2 id="cert-overview-title">Issued Certificates Ledger</h2>
           <p className="cert-overview-subtext">
-            Oversight of all certificates generated and finalized across the organization.
+            Oversight of all credentials generated, published, and finalized across the organization.
           </p>
         </div>
         <div className="cert-overview-actions">
-          <span className="cert-overview-count">{certificates.length} Total</span>
+          <span className="cert-overview-count">
+            <Award size={13} />
+            <span>{certificates.length} Total</span>
+          </span>
           <button
             type="button"
             className="cert-overview-refresh"
             onClick={fetchCertificates}
             disabled={loading}
           >
-            {loading ? 'Refreshing…' : '↻ Refresh'}
+            <RefreshCw size={13} className={loading ? 'spin' : ''} />
+            <span>{loading ? 'Refreshing…' : 'Refresh'}</span>
           </button>
         </div>
       </div>
@@ -143,20 +158,25 @@ export default function CertificatesOverview() {
       {loading && (
         <div className="cert-overview-state" role="status">
           <div className="cert-overview-spinner" aria-hidden="true" />
-          <p>Loading certificate records…</p>
+          <p>Loading certificate ledger…</p>
         </div>
       )}
 
       {!loading && error && (
         <div className="cert-overview-error" role="alert">
-          <p>⚠ {error}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
           <button type="button" onClick={fetchCertificates}>Retry</button>
         </div>
       )}
 
       {!loading && !error && certificates.length === 0 && (
         <div className="cert-overview-empty">
-          <div className="cert-empty-icon" aria-hidden="true">📜</div>
+          <div className="cert-empty-icon-wrap" aria-hidden="true">
+            <Award size={28} />
+          </div>
           <h3>No Certificates Generated Yet</h3>
           <p>When certificate drafts are approved and finalized, their official records will appear here.</p>
         </div>
@@ -169,11 +189,11 @@ export default function CertificatesOverview() {
               <tr>
                 <th>Certificate No.</th>
                 <th>Intern Name</th>
-                <th>Code</th>
-                <th>Type</th>
+                <th>Intern Code</th>
+                <th>Credential Type</th>
                 <th>Issued Date</th>
                 <th>Status</th>
-                <th>PDF Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -208,43 +228,56 @@ export default function CertificatesOverview() {
                     </td>
                     <td>
                       <div className="cert-row-actions">
-                      {hasPdf ? (
-                        <button
-                          type="button"
-                          className="cert-pdf-btn"
-                          onClick={() => handleDownload(cert)}
-                          disabled={isDownloading}
-                          title="Download official finalized PDF"
-                        >
-                          {isDownloading ? (
-                            <>
-                              <span className="cert-mini-spinner" aria-hidden="true" />
-                              <span>Downloading…</span>
-                            </>
-                          ) : (
-                            <span>📥 Download PDF</span>
-                          )}
-                        </button>
-                      ) : cert.status === 'draft' ? (
-                        <button
-                          type="button"
-                          className="cert-review-link-btn"
-                          onClick={() => navigate(`/admin/certificates/${cert._id}/review`)}
-                          title="Open draft in review editor"
-                        >
-                          Review Draft →
-                        </button>
-                      ) : (
-                        <span className="cert-pdf-unavailable" title="PDF is not available">
-                          Unavailable
-                        </span>
-                      )}
-                      {canRevoke && <button type="button" className="cert-revoke-btn" onClick={() => handleRevoke(cert)} disabled={revokingId === cert._id}>
-                        {revokingId === cert._id ? 'Revoking…' : 'Revoke'}
-                      </button>}
-                      {cert.status === 'revoked' && <button type="button" className="cert-revoke-btn" onClick={() => handleUnrevoke(cert)} disabled={revokingId === cert._id}>
-                        {revokingId === cert._id ? 'Reinstating…' : 'Unrevoke'}
-                      </button>}
+                        {hasPdf ? (
+                          <button
+                            type="button"
+                            className="cert-pdf-btn"
+                            onClick={() => handleDownload(cert)}
+                            disabled={isDownloading}
+                            title="Download official finalized PDF"
+                          >
+                            <Download size={13} />
+                            <span>{isDownloading ? 'Downloading…' : 'PDF'}</span>
+                          </button>
+                        ) : cert.status === 'draft' ? (
+                          <button
+                            type="button"
+                            className="cert-review-link-btn"
+                            onClick={() => navigate(`/admin/certificates/${cert._id}/review`)}
+                            title="Open draft in review editor"
+                          >
+                            <span>Review Draft</span>
+                            <ArrowRight size={13} />
+                          </button>
+                        ) : (
+                          <span className="cert-pdf-unavailable" title="PDF is not available">
+                            Unavailable
+                          </span>
+                        )}
+
+                        {canRevoke && (
+                          <button
+                            type="button"
+                            className="cert-revoke-btn"
+                            onClick={() => handleRevoke(cert)}
+                            disabled={revokingId === cert._id}
+                          >
+                            <ShieldAlert size={12} />
+                            <span>{revokingId === cert._id ? 'Revoking…' : 'Revoke'}</span>
+                          </button>
+                        )}
+
+                        {cert.status === 'revoked' && (
+                          <button
+                            type="button"
+                            className="cert-reinstate-btn"
+                            onClick={() => handleUnrevoke(cert)}
+                            disabled={revokingId === cert._id}
+                          >
+                            <RotateCcw size={12} />
+                            <span>{revokingId === cert._id ? 'Reinstating…' : 'Reinstate'}</span>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

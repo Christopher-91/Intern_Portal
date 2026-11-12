@@ -1,4 +1,6 @@
 import useTeamLeaderInterns from '../hooks/useTeamLeaderInterns';
+import StatusBadge from '../../shared/components/StatusBadge';
+import { ArrowLeft, Users, Mail, Calendar, AlertCircle } from 'lucide-react';
 import './TeamLeadersSection.css';
 
 const formatDate = (date) => date
@@ -10,7 +12,10 @@ export default function TeamLeaderInternsView({ teamLeaderId, onBack }) {
 
   return (
     <section className="team-leaders-panel" aria-labelledby="team-leader-interns-title">
-      <button className="team-leaders-back" type="button" onClick={onBack}>← Back to Team Leaders</button>
+      <button className="team-leaders-back" type="button" onClick={onBack}>
+        <ArrowLeft size={14} />
+        <span>Back to Team Leader Roster</span>
+      </button>
 
       {loading && (
         <div className="team-interns-loading" aria-label="Loading interns">
@@ -21,7 +26,10 @@ export default function TeamLeaderInternsView({ teamLeaderId, onBack }) {
 
       {!loading && error && (
         <div className="team-leaders-error" role="alert">
-          <span>{error === 'Team leader not found' ? 'This team leader could not be found.' : error}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={16} />
+            <span>{error === 'Team leader not found' ? 'This team leader could not be found.' : error}</span>
+          </div>
           <button type="button" onClick={refetch}>Retry</button>
         </div>
       )}
@@ -30,31 +38,54 @@ export default function TeamLeaderInternsView({ teamLeaderId, onBack }) {
         <>
           <div className="team-leaders-heading team-interns-heading">
             <div>
-              <p className="admin-eyebrow">ASSIGNED INTERNS</p>
-              <h2 id="team-leader-interns-title">Interns under {teamLeader.fullName}</h2>
-              <p>{teamLeader.email}</p>
+              <h2 id="team-leader-interns-title">Interns assigned to {teamLeader.fullName}</h2>
+              <p className="tl-email-subtitle">{teamLeader.email}</p>
             </div>
-            <span className="team-leaders-count">{interns.length} assigned</span>
+            <span className="team-leaders-count">
+              <Users size={12} />
+              <span>{interns.length} assigned</span>
+            </span>
           </div>
 
-          {!interns.length && <p className="team-leaders-state">This team leader has no interns assigned yet</p>}
+          {!interns.length && (
+            <div className="team-leaders-state">
+              This team leader has no interns assigned yet. Interns can be assigned from the Intern Directory.
+            </div>
+          )}
 
           {interns.length > 0 && (
             <div className="intern-list">
               {interns.map((intern) => (
                 <article className="intern-row" key={intern._id || intern.id || intern.email}>
                   <div className="intern-row-heading">
-                    <div>
-                      <h3>{intern.fullName}</h3>
-                      <p>{intern.email}</p>
+                    <div className="intern-title-group">
+                      <div className="intern-avatar-small">
+                        {intern.fullName?.charAt(0)?.toUpperCase() || 'I'}
+                      </div>
+                      <div>
+                        <h3>{intern.fullName}</h3>
+                        <p>{intern.email}</p>
+                      </div>
                     </div>
-                    <span className="intern-status">{intern.internshipDetails?.status || '—'}</span>
+                    <StatusBadge status={intern.internshipDetails?.status} />
                   </div>
                   <div className="intern-details">
-                    <div><span>Intern code</span><strong>{intern.internCode || '—'}</strong></div>
-                    <div><span>Domain</span><strong>{intern.domain || '—'}</strong></div>
-                    <div><span>Start date</span><strong>{formatDate(intern.startDate)}</strong></div>
-                    <div><span>End date</span><strong>{formatDate(intern.endDate)}</strong></div>
+                    <div className="detail-box">
+                      <span>Intern code</span>
+                      <code>{intern.internCode || '—'}</code>
+                    </div>
+                    <div className="detail-box">
+                      <span>Domain</span>
+                      <strong>{intern.domain || '—'}</strong>
+                    </div>
+                    <div className="detail-box">
+                      <span>Start date</span>
+                      <strong>{formatDate(intern.startDate)}</strong>
+                    </div>
+                    <div className="detail-box">
+                      <span>End date</span>
+                      <strong>{formatDate(intern.endDate)}</strong>
+                    </div>
                   </div>
                 </article>
               ))}

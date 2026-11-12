@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CertificateTemplateEditor from "../components/CertificateTemplateEditor";
 import Toast from "../../../shared/components/Toast";
+import BrandLogo from "../../shared/components/BrandLogo";
 import {
   createCertificateTemplate,
   getCertificateTemplates,
   getTemplatePlaceholders,
   updateCertificateTemplate,
 } from "../services/admin.service";
+import { ArrowLeft, Plus, Eye, Code, Save, RefreshCw, AlertCircle } from "lucide-react";
 
 const SAMPLE_DATA = {
   fullName: "Sarvesh Choudhary",
@@ -38,6 +41,7 @@ function replacePlaceholders(html) {
 }
 
 export default function CertificateTemplateEditorPage() {
+  const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
 
@@ -249,7 +253,7 @@ export default function CertificateTemplateEditorPage() {
       }
 
       setIsDirty(false);
-      setSuccess(createMode ? "Certificate template created." : "Certificate template saved.");
+      setSuccess(createMode ? "Certificate template created successfully." : "Certificate template saved successfully.");
       return true;
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || "Unable to save certificate template.";
@@ -332,6 +336,7 @@ export default function CertificateTemplateEditorPage() {
           alignItems: "center",
           justifyContent: "center",
           padding: "24px",
+          color: "var(--text-secondary)",
         }}
       >
         <p role="status">Loading certificate templates…</p>
@@ -366,9 +371,24 @@ export default function CertificateTemplateEditorPage() {
       className="certificate-template-editor-page"
       style={{
         minHeight: "100vh",
-        padding: "24px",
+        padding: "24px 32px",
+        backgroundColor: "var(--bg-page)",
+        color: "var(--text-primary)",
       }}
     >
+      <button
+        type="button"
+        onClick={() => {
+          if (isDirty && !window.confirm("Discard unsaved template changes?")) return;
+          navigate("/admin/dashboard?view=certificates");
+        }}
+        className="admin-btn-sm"
+        style={{ display: "inline-flex", alignItems: "center", gap: "6px", marginBottom: "16px" }}
+      >
+        <ArrowLeft size={14} />
+        <span>Back to Admin Dashboard</span>
+      </button>
+
       {/* Header */}
       <div
         style={{
@@ -376,7 +396,7 @@ export default function CertificateTemplateEditorPage() {
           justifyContent: "space-between",
           alignItems: "center",
           gap: "16px",
-          marginBottom: "24px",
+          marginBottom: "20px",
           flexWrap: "wrap",
         }}
       >
@@ -384,63 +404,90 @@ export default function CertificateTemplateEditorPage() {
           <h1
             style={{
               margin: 0,
-              marginBottom: "8px",
+              marginBottom: "4px",
+              fontSize: "24px",
+              fontWeight: 700,
             }}
           >
-            {createMode ? "Create Certificate Template" : "Certificate Template Editor"}
+            {createMode ? "Create Certificate Template" : "Certificate Template Studio"}
           </h1>
 
           <p
             style={{
               margin: 0,
-              opacity: 0.75,
+              color: "var(--text-secondary)",
+              fontSize: "13px",
             }}
           >
-            Design, edit, preview, and save certificate templates on an A4
-            landscape editor.
+            Design, edit, and preview enterprise certificate templates on an A4 landscape layout.
           </p>
         </div>
 
-        <div className="certificate-template-header-actions">
-        <button type="button" onClick={startNewTemplate}>
-          Create Template
-        </button>
-        <button
-          type="button"
-          onClick={() => setPreviewMode((value) => !value)}
-          style={{
-            padding: "10px 18px",
-            borderRadius: "8px",
-            border: "1px solid #64748b",
-            cursor: "pointer",
-          }}
-        >
-          {previewMode ? "Edit Template" : "Preview with sample data"}
-        </button>
+        <div className="certificate-template-header-actions" style={{ display: "flex", gap: "10px" }}>
+          <button
+            type="button"
+            className="admin-btn-sm admin-btn-primary-sm"
+            onClick={startNewTemplate}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <Plus size={14} />
+            <span>New Template</span>
+          </button>
+          <button
+            type="button"
+            className="admin-btn-sm"
+            onClick={() => setPreviewMode((value) => !value)}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            {previewMode ? <Code size={14} /> : <Eye size={14} />}
+            <span>{previewMode ? "Code Editor" : "Live Sample Preview"}</span>
+          </button>
         </div>
       </div>
 
-      {/* Error */}
-      {error && <Toast type="error" message={error} />}
-      {success && <Toast type="success" message={success} />}
+      {/* Feedback Alerts */}
+      {error && <Toast type="error" message={error} onClose={() => setError("")} />}
+      {success && <Toast type="success" message={success} onClose={() => setSuccess("")} />}
 
-      {/* Template selector */}
+      {/* Template selector & Metadata */}
       <div
         style={{
           marginBottom: "20px",
-          padding: "16px",
-          borderRadius: "10px",
-          border: "1px solid #475569",
+          padding: "18px 20px",
+          borderRadius: "var(--radius-xl)",
+          border: "1px solid var(--border-subtle)",
+          backgroundColor: "var(--bg-surface)",
         }}
       >
-        {!createMode && <>
-          <label htmlFor="certificate-template" style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>
-            Select Certificate Template
-          </label>
-          <select id="certificate-template" value={selectedTemplateId} onChange={handleTemplateChange} style={{ width: "100%", maxWidth: "600px", padding: "10px", borderRadius: "8px" }}>
-            {templates.map((template) => <option key={template._id} value={template._id}>{template.templateName} ({template.templateCode})</option>)}
-          </select>
-        </>}
+        {!createMode && (
+          <div style={{ marginBottom: "14px" }}>
+            <label htmlFor="certificate-template" style={{ display: "block", marginBottom: "6px", fontWeight: 600, fontSize: "12px", color: "var(--text-muted)", textTransform: "uppercase" }}>
+              Active Certificate Template
+            </label>
+            <select
+              id="certificate-template"
+              value={selectedTemplateId}
+              onChange={handleTemplateChange}
+              style={{
+                width: "100%",
+                maxWidth: "480px",
+                padding: "8px 12px",
+                borderRadius: "var(--radius-md)",
+                border: "1px solid var(--border-default)",
+                backgroundColor: "var(--bg-surface)",
+                color: "var(--text-primary)",
+                fontSize: "13px",
+              }}
+            >
+              {templates.map((template) => (
+                <option key={template._id} value={template._id}>
+                  {template.templateName} ({template.templateCode})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="certificate-template-create-fields">
           {[
             ["templateCode", "Template code"],
@@ -450,21 +497,39 @@ export default function CertificateTemplateEditorPage() {
           ].map(([name, label]) => (
             <label key={name}>
               {label}
-              <input required value={templateDetails[name]} onChange={(event) => { setIsDirty(true); setTemplateDetails((current) => ({ ...current, [name]: event.target.value })); }} />
+              <input
+                required
+                value={templateDetails[name]}
+                onChange={(event) => {
+                  setIsDirty(true);
+                  setTemplateDetails((current) => ({ ...current, [name]: event.target.value }));
+                }}
+              />
             </label>
           ))}
-          <label>Status
-            <select value={templateDetails.status} onChange={(event) => { setIsDirty(true); setTemplateDetails((current) => ({ ...current, status: event.target.value })); }}>
+          <label>
+            Status
+            <select
+              value={templateDetails.status}
+              onChange={(event) => {
+                setIsDirty(true);
+                setTemplateDetails((current) => ({ ...current, status: event.target.value }));
+              }}
+            >
               <option value="draft">Draft</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </label>
         </div>
-        {!createMode && selectedTemplate && <small className="certificate-template-version">Current version: {selectedTemplate.version || 1}</small>}
+        {!createMode && selectedTemplate && (
+          <small className="certificate-template-version" style={{ color: "var(--text-muted)", marginTop: "8px", display: "block" }}>
+            Revision: {selectedTemplate.version || 1}
+          </small>
+        )}
       </div>
 
-      {/* Main content */}
+      {/* Main Studio content */}
       <div
         style={{
           display: "grid",
@@ -478,8 +543,9 @@ export default function CertificateTemplateEditorPage() {
           style={{
             minWidth: 0,
             overflow: "auto",
-            borderRadius: "10px",
-            border: "1px solid #475569",
+            borderRadius: "var(--radius-xl)",
+            border: "1px solid var(--border-subtle)",
+            backgroundColor: "var(--bg-surface)",
             padding: "16px",
           }}
         >
@@ -489,9 +555,11 @@ export default function CertificateTemplateEditorPage() {
                 style={{
                   marginTop: 0,
                   marginBottom: "16px",
+                  fontSize: "16px",
+                  fontWeight: 700,
                 }}
               >
-                Certificate Preview
+                A4 Landscape Live Preview (Rendered with sample intern data)
               </h2>
 
               <div
@@ -501,6 +569,8 @@ export default function CertificateTemplateEditorPage() {
                   margin: "0 auto",
                   background: "#ffffff",
                   overflow: "hidden",
+                  boxShadow: "var(--shadow-md)",
+                  borderRadius: "8px",
                 }}
               >
                 <iframe
@@ -526,56 +596,52 @@ export default function CertificateTemplateEditorPage() {
               saving={saving}
             />
           )}
-
-          {saving && (
-            <p
-              style={{
-                marginTop: "12px",
-                marginBottom: 0,
-              }}
-            >
-              Saving template...
-            </p>
-          )}
         </div>
 
         {/* Placeholder panel */}
         <aside
           style={{
-            border: "1px solid #475569",
-            borderRadius: "10px",
-            padding: "16px",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: "var(--radius-xl)",
+            backgroundColor: "var(--bg-surface)",
+            padding: "18px",
           }}
         >
           <h2
             style={{
               marginTop: 0,
-              fontSize: "18px",
+              fontSize: "15px",
+              fontWeight: 700,
             }}
           >
-            Available Placeholders
+            Insert Placeholders
           </h2>
+          <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "2px", marginBottom: "12px" }}>
+            Click any token to insert into cursor position.
+          </p>
 
           {loadingPlaceholders ? (
-            <p>Loading placeholders...</p>
+            <p style={{ fontSize: "12px", color: "var(--text-muted)" }}>Loading placeholders…</p>
           ) : placeholders.length === 0 ? (
-            <p>No placeholders available.</p>
+            <p style={{ fontSize: "12px", color: "var(--text-muted)" }}>No placeholders available.</p>
           ) : (
             <ul
               style={{
-                paddingLeft: "20px",
-                marginBottom: 0,
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                display: "grid",
+                gap: "6px",
               }}
             >
               {placeholders.map((placeholder) => (
-                <li
-                  key={placeholder}
-                  style={{
-                    marginBottom: "8px",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  <button type="button" className="certificate-placeholder-button" disabled={!editorController || previewMode} onClick={() => editorController?.insertPlaceholder(placeholder)}>
+                <li key={placeholder}>
+                  <button
+                    type="button"
+                    className="certificate-placeholder-button"
+                    disabled={!editorController || previewMode}
+                    onClick={() => editorController?.insertPlaceholder(placeholder)}
+                  >
                     <code>{placeholder}</code>
                   </button>
                 </li>
@@ -585,49 +651,36 @@ export default function CertificateTemplateEditorPage() {
 
           <hr
             style={{
-              margin: "20px 0",
+              margin: "18px 0",
+              border: "none",
+              borderTop: "1px solid var(--border-subtle)",
             }}
           />
 
           <h3
             style={{
-              fontSize: "16px",
+              fontSize: "14px",
+              fontWeight: 700,
+              marginBottom: "8px",
             }}
           >
-            Sample Data
+            Sample Interpolation
           </h3>
 
           <div
             style={{
-              fontSize: "13px",
+              fontSize: "12px",
               lineHeight: 1.6,
-              wordBreak: "break-word",
+              color: "var(--text-secondary)",
+              display: "grid",
+              gap: "4px",
             }}
           >
-            <div>
-              <strong>Name:</strong>{" "}
-              {SAMPLE_DATA.fullName}
-            </div>
-
-            <div>
-              <strong>Intern Code:</strong>{" "}
-              {SAMPLE_DATA.internCode}
-            </div>
-
-            <div>
-              <strong>Domain:</strong>{" "}
-              {SAMPLE_DATA.domain}
-            </div>
-
-            <div>
-              <strong>Request:</strong>{" "}
-              {SAMPLE_DATA.requestNumber}
-            </div>
-
-            <div>
-              <strong>Issue Date:</strong>{" "}
-              {SAMPLE_DATA.issueDate}
-            </div>
+            <div><strong>Name:</strong> {SAMPLE_DATA.fullName}</div>
+            <div><strong>Code:</strong> {SAMPLE_DATA.internCode}</div>
+            <div><strong>Domain:</strong> {SAMPLE_DATA.domain}</div>
+            <div><strong>Request:</strong> {SAMPLE_DATA.requestNumber}</div>
+            <div><strong>Issue Date:</strong> {SAMPLE_DATA.issueDate}</div>
           </div>
         </aside>
       </div>

@@ -1,3 +1,4 @@
+import { Download, FileSpreadsheet, RefreshCw, Calendar, Filter } from 'lucide-react';
 
 export default function AnalyticsControls({
   range,
@@ -75,35 +76,39 @@ export default function AnalyticsControls({
         )}
 
         {domainsList.length > 0 && (
-          <select
-            className="control-select"
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
-            aria-label="Filter by Domain"
-          >
-            <option value="">All Domains</option>
-            {domainsList.map((d) => (
-              <option key={d.domain || d} value={d.domain || d}>
-                {d.domain || d}
-              </option>
-            ))}
-          </select>
+          <div className="select-with-icon">
+            <select
+              className="control-select"
+              value={domain}
+              onChange={(e) => setDomain(e.target.value)}
+              aria-label="Filter by Domain"
+            >
+              <option value="">All Domains</option>
+              {domainsList.map((d) => (
+                <option key={d.domain || d} value={d.domain || d}>
+                  {d.domain || d}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
 
         {teamLeadersList.length > 0 && (
-          <select
-            className="control-select"
-            value={teamLeader}
-            onChange={(e) => setTeamLeader(e.target.value)}
-            aria-label="Filter by Team Leader"
-          >
-            <option value="">All Team Leaders</option>
-            {teamLeadersList.map((tl) => (
-              <option key={tl.id || tl._id} value={tl.id || tl._id}>
-                {tl.fullName}
-              </option>
-            ))}
-          </select>
+          <div className="select-with-icon">
+            <select
+              className="control-select"
+              value={teamLeader}
+              onChange={(e) => setTeamLeader(e.target.value)}
+              aria-label="Filter by Team Leader"
+            >
+              <option value="">All Team Leaders</option>
+              {teamLeadersList.map((tl) => (
+                <option key={tl.id || tl._id} value={tl.id || tl._id}>
+                  {tl.fullName}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
       </div>
 
@@ -126,7 +131,8 @@ export default function AnalyticsControls({
           onClick={() => onExport('overview')}
           title="Export Analytics to CSV"
         >
-          <span>📥</span> Export CSV
+          <Download size={14} />
+          <span>Export CSV</span>
         </button>
 
         <button
@@ -135,7 +141,8 @@ export default function AnalyticsControls({
           onClick={() => onExport('overview', 'xlsx')}
           title="Export Analytics to Excel"
         >
-          Export Excel
+          <FileSpreadsheet size={14} />
+          <span>Export Excel</span>
         </button>
 
         <button
@@ -144,7 +151,8 @@ export default function AnalyticsControls({
           onClick={onRefresh}
           title="Refresh Data"
         >
-          <span>🔄</span> Refresh
+          <RefreshCw size={14} />
+          <span>Refresh</span>
         </button>
 
         {lastUpdated && (

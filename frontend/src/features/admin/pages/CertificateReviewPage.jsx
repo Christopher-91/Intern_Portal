@@ -5,12 +5,26 @@ import CertificatePreview from '../components/CertificatePreview';
 import CertificateTemplateEditor from '../components/CertificateTemplateEditor';
 import useCertificateDraft from '../hooks/useCertificateDraft';
 import Toast from '../../../shared/components/Toast';
+import BrandLogo from '../../shared/components/BrandLogo';
+import {
+  ArrowLeft,
+  LogOut,
+  AlertCircle,
+  Info,
+  Copy,
+  Check,
+  RotateCcw,
+  CheckCircle2,
+  Save,
+  Send,
+  FileCheck
+} from 'lucide-react';
 import './CertificateReviewPage.css';
 
 /**
  * CertificateReviewPage
  *
- * Day 4 Certificate Engine Review & Finalization Interface.
+ * Certificate Review & Finalization Interface.
  * Connects real certificate draft fetching, live HTML editing,
  * iframe-based preview rendering, draft persistence, and
  * final PDF generation + email delivery.
@@ -59,7 +73,7 @@ export default function CertificateReviewPage() {
 
   const handleBack = () => {
     if (draftDirty && !window.confirm('You have unsaved certificate edits. Leave without saving?')) return;
-    navigate('/admin/dashboard');
+    navigate('/admin/dashboard?view=requests');
   };
 
   const handleSaveDraft = async () => {
@@ -102,24 +116,26 @@ export default function CertificateReviewPage() {
   return (
     <div className="certificate-review-shell">
       <header className="certificate-review-topbar">
-        <div className="certificate-review-brand">
-          <span className="certificate-review-brand-icon">UP</span>
-          <strong>uptoskills</strong>
+        <div className="certificate-review-brand-row">
+          <BrandLogo size="small" subtitle="Cert Review" />
         </div>
 
         <div className="certificate-review-user-area">
-          <div className="certificate-review-avatar">{initials}</div>
+          <div className="certificate-review-avatar" aria-hidden="true">
+            {initials}
+          </div>
           <div>
             <strong>{user?.fullName || 'Administrator'}</strong>
             <small>{user?.email || 'Admin Portal'}</small>
           </div>
           <button
             type="button"
-            className="admin-logout"
+            className="admin-logout-btn"
             onClick={onLogout}
             title="Sign out"
           >
-            <span>↩</span> Logout
+            <LogOut size={14} />
+            <span>Sign out</span>
           </button>
         </div>
       </header>
@@ -131,20 +147,20 @@ export default function CertificateReviewPage() {
               type="button"
               className="certificate-back-button"
               onClick={handleBack}
-              aria-label="Back to Admin Dashboard"
+              aria-label="Back to Certificate Requests"
             >
-              <span>←</span> Back to Certificate Requests
+              <ArrowLeft size={14} />
+              <span>Back to Requests Queue</span>
             </button>
           </div>
 
           <div className="certificate-review-title-row">
             <div className="certificate-review-title-block">
-              <p className="admin-eyebrow">CERTIFICATE DESK</p>
-              <h1>{isFinalized ? 'Finalized Certificate' : 'Review Certificate Draft'}</h1>
+              <h1>{isFinalized ? 'Finalized Certificate Record' : 'Review & Customize Certificate Draft'}</h1>
               <p>
                 {isFinalized
-                  ? 'This certificate has been finalized and locked. The official PDF has been generated.'
-                  : 'Review and customize the certificate HTML. Click "Finalize & Send" when ready to render the PDF and deliver via email.'}
+                  ? 'This certificate has been finalized and locked. The official PDF has been rendered and delivered.'
+                  : 'Review markup and visual preview. When ready, finalize to generate official vector PDF and deliver to the intern.'}
               </p>
             </div>
 
@@ -166,8 +182,8 @@ export default function CertificateReviewPage() {
               type={finalizeSuccess.emailSent ? 'success' : 'info'}
               message={
                 finalizeSuccess.emailSent
-                  ? '✓ Certificate finalized, PDF generated, and email sent to intern successfully!'
-                  : `✓ Certificate finalized & PDF generated. (Email notice: ${finalizeSuccess.emailError})`
+                  ? 'Certificate finalized, PDF generated, and email delivered successfully.'
+                  : `Certificate finalized and PDF generated. (${finalizeSuccess.emailError})`
               }
             />
           </div>
@@ -175,10 +191,7 @@ export default function CertificateReviewPage() {
 
         {finalizeError && (
           <div className="certificate-review-toast-container">
-            <Toast
-              type="error"
-              message={finalizeError}
-            />
+            <Toast type="error" message={finalizeError} />
           </div>
         )}
 
@@ -186,14 +199,14 @@ export default function CertificateReviewPage() {
         {loading && (
           <div className="certificate-review-state-panel loading" role="status">
             <div className="certificate-review-spinner" aria-hidden="true" />
-            <p>Loading certificate draft...</p>
+            <p>Loading certificate draft…</p>
           </div>
         )}
 
         {/* Fetch Error State */}
         {!loading && error && (
           <div className="certificate-review-state-panel error" role="alert">
-            <div className="certificate-error-icon" aria-hidden="true">⚠</div>
+            <AlertCircle size={24} style={{ color: '#EF4444' }} />
             <div className="certificate-error-content">
               <h3>Unable to load certificate draft.</h3>
               <p>{error}</p>
@@ -214,7 +227,7 @@ export default function CertificateReviewPage() {
             {/* Request context banner */}
             <section className="certificate-context-banner" aria-label="Certificate request context">
               <div className="certificate-context-icon" aria-hidden="true">
-                <span>ℹ</span>
+                <Info size={16} />
               </div>
               <div className="certificate-context-info">
                 <div className="certificate-context-info-top">
@@ -231,8 +244,8 @@ export default function CertificateReviewPage() {
                 </div>
                 <p className="certificate-context-desc">
                   {isFinalized
-                    ? `This certificate is finalized. The rendered PDF is stored at: ${draft?.pdfPath || 'uploads/certificates'}.`
-                    : 'Customize markup and styles below. Save Draft preserves edits; Finalize & Send generates the official PDF and emails it to the intern.'}
+                    ? `This certificate is finalized. The rendered PDF is archived at: ${draft?.pdfPath || 'uploads/certificates'}.`
+                    : 'Modify HTML markup and styling below. Real-time preview updates automatically as you edit.'}
                 </p>
               </div>
             </section>
@@ -246,7 +259,7 @@ export default function CertificateReviewPage() {
               <section className="certificate-editor-container" aria-label="Certificate HTML editor panel">
                 <header className="certificate-editor-header">
                   <div className="certificate-editor-title-group">
-                    <h2 className="certificate-editor-title">HTML Template Editor</h2>
+                    <h2 className="certificate-editor-title">HTML Template Source</h2>
                     <span className="certificate-editor-meta">{lineCount} lines · {htmlContent.length} chars</span>
                   </div>
 
@@ -257,7 +270,8 @@ export default function CertificateReviewPage() {
                       onClick={handleCopyHtml}
                       title="Copy HTML to clipboard"
                     >
-                      <span>{copied ? '✓ Copied' : '📋 Copy HTML'}</span>
+                      {copied ? <Check size={13} style={{ color: '#10B981' }} /> : <Copy size={13} />}
+                      <span>{copied ? 'Copied' : 'Copy HTML'}</span>
                     </button>
                     {!isFinalized && (
                       <button
@@ -266,7 +280,8 @@ export default function CertificateReviewPage() {
                         onClick={handleResetDraft}
                         title="Reset to last saved draft content"
                       >
-                        <span>↺ Revert to Saved</span>
+                        <RotateCcw size={13} />
+                        <span>Revert Changes</span>
                       </button>
                     )}
                   </div>
@@ -275,8 +290,8 @@ export default function CertificateReviewPage() {
                 <div className="certificate-editor-body">
                   <p className="certificate-editor-instructions">
                     {isFinalized
-                      ? 'This certificate is finalized. Markup is in read-only mode.'
-                      : 'Modify HTML markup or certificate details below. The preview updates in real-time.'}
+                      ? 'This certificate is finalized. Markup is locked in read-only mode.'
+                      : 'Modify HTML markup below. The document preview renders updates dynamically.'}
                   </p>
 
                   <div className="certificate-editor-field">
@@ -304,7 +319,8 @@ export default function CertificateReviewPage() {
                       disabled={saving || loading || finalizing || isFinalized}
                       title={isFinalized ? 'Certificate is finalized' : 'Save modifications to the certificate draft'}
                     >
-                      {saving ? 'Saving...' : 'Save Draft'}
+                      <Save size={14} />
+                      <span>{saving ? 'Saving…' : 'Save Draft'}</span>
                     </button>
 
                     {/* Finalize & Send Button */}
@@ -319,7 +335,17 @@ export default function CertificateReviewPage() {
                           : 'Render PDF, finalize document, and send email to intern'
                       }
                     >
-                      {finalizing ? 'Finalizing & Sending...' : isFinalized ? '✓ Finalized' : 'Finalize & Send'}
+                      {isFinalized ? (
+                        <>
+                          <CheckCircle2 size={14} />
+                          <span>Finalized & Delivered</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send size={14} />
+                          <span>{finalizing ? 'Finalizing & Sending…' : 'Finalize & Send'}</span>
+                        </>
+                      )}
                     </button>
 
                     {saveSuccess && (

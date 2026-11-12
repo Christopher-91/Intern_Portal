@@ -14,6 +14,31 @@ import RetentionManagement from '../components/RetentionManagement';
 import AnalyticsView from '../analytics/pages/AnalyticsView';
 import AuditLogsPage from './AuditLogsPage';
 import NotificationBell from '../../shared/components/NotificationBell';
+import BrandLogo from '../../shared/components/BrandLogo';
+
+import {
+  LayoutDashboard,
+  ChartNoAxesCombined,
+  Users,
+  Briefcase,
+  UserPlus,
+  UserCheck,
+  Inbox,
+  Award,
+  ScrollText,
+  Archive,
+  ShieldCheck,
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+  Mail,
+  Phone,
+  Calendar,
+  Sparkles,
+  Shield,
+  Activity
+} from 'lucide-react';
 
 import './AdminDashboard.css';
 
@@ -23,6 +48,7 @@ const AdminDashboard = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [fallbackView, setFallbackView] = useState('overview');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const activeView = searchParams.get('view') || fallbackView;
 
   const initials = (user?.fullName || 'Admin')
@@ -37,584 +63,446 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
-  /*
-   * Navigate to certificate template editor.
-   */
   const openCertificateTemplates = () => {
+    setMobileMenuOpen(false);
     navigate('/admin/certificate-templates');
   };
 
-  /*
-   * Change dashboard view.
-   */
   const changeView = (view) => {
     setFallbackView(view);
+    setMobileMenuOpen(false);
     if (searchParams.has('view')) setSearchParams({});
   };
 
-  /*
-   * Dynamic page heading.
-   */
   const getPageTitle = () => {
     switch (activeView) {
       case 'analytics':
         return 'Admin Analytics';
-
       case 'interns':
         return 'Intern Management';
-
       case 'teamleaders':
-        return 'Team Leader Management';
-
+        return 'Team Leader Roster';
       case 'intern':
-        return 'Create an intern';
-
+        return 'Create Intern Account';
       case 'teamleader':
-        return 'Create a team leader';
-
+        return 'Create Team Leader';
       case 'requests':
         return 'Certificate Requests';
-
       case 'certificates':
         return 'Issued Certificates';
-
       case 'retention':
-        return 'Account Retention';
-
+        return 'Account Retention & Archives';
       case 'audit':
-        return 'Audit Logs';
-
+        return 'Security & Audit Logs';
       case 'overview':
       default:
-        return 'Welcome back';
+        return 'Portal Overview';
     }
   };
 
-  /*
-   * Dynamic page description.
-   */
   const getPageDescription = () => {
     switch (activeView) {
       case 'analytics':
-        return 'Comprehensive performance metrics, issuance speed, team leader bottlenecks, and analytics.';
-
+        return 'Real-time performance metrics, issuance speed, team leader bottlenecks, and domain analytics.';
       case 'interns':
-        return 'View, edit, and assign or reassign all interns across Team Leaders.';
-
+        return 'View, filter, edit, and assign or reassign intern accounts across team leaders.';
       case 'teamleaders':
-        return 'View, search, and manage all Team Leaders and their assigned intern teams.';
-
+        return 'Directory and workload metrics for all active team leaders and their intern assignments.';
       case 'intern':
-        return 'Complete the details below to create a new intern account.';
-
+        return 'Provision a new intern profile, specify tenure dates, and assign to a team leader.';
       case 'teamleader':
-        return 'Complete the details below to create a new team leader account.';
-
+        return 'Create a team leader administrative account with department assignment.';
       case 'requests':
-        return 'Finalize certificate requests forwarded by Team Leaders.';
-
+        return 'Review and finalize certificate approval requests forwarded by team leaders.';
       case 'certificates':
-        return 'Audit and manage all generated certificates across the portal.';
-
+        return 'Comprehensive ledger of all generated certificates with verification and revocation controls.';
       case 'retention':
-        return 'Set archive and purge periods, review archived interns, and restore accounts.';
-
+        return 'Configure automated archival policies, manage purge cycles, and restore archived interns.';
       case 'audit':
-        return 'Review security events and administrative changes across the portal.';
-
+        return 'Immutable event log recording all authentication, modification, and security operations.';
       case 'overview':
       default:
-        return 'Manage your portal accounts, certificates, templates, and administration from one secure workspace.';
+        return 'Manage portal users, certificate issuances, system health, and administrative workflows.';
     }
   };
 
   return (
-    <div className="admin-dashboard-shell">
-
+    <div className={`admin-dashboard-shell ${mobileMenuOpen ? 'mobile-menu-active' : ''}`}>
       {/* =========================================================
           TOP BAR
       ========================================================== */}
       <header className="admin-topbar">
+        <div className="admin-topbar-left">
+          <button
+            type="button"
+            className="mobile-nav-toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
 
-        <div className="admin-brand">
-          <span className="admin-brand-icon">UP</span>
-          <strong>uptoskills</strong>
+          <BrandLogo size="small" subtitle="Admin" />
+
+          <div className="admin-breadcrumb-separator" aria-hidden="true">/</div>
+
+          <div className="admin-topbar-breadcrumb">
+            <span className="breadcrumb-root">Workspace</span>
+            <ChevronRight size={14} className="breadcrumb-arrow" />
+            <span className="breadcrumb-active">{getPageTitle()}</span>
+          </div>
         </div>
 
-        <div className="admin-topbar-user">
+        <div className="admin-topbar-right">
+          <div className="system-status-indicator" title="System operational">
+            <span className="status-indicator-dot" />
+            <span className="status-indicator-label">Live</span>
+          </div>
 
           <NotificationBell />
 
-          <div className="admin-avatar">
-            {initials}
+          <div className="admin-user-profile-menu">
+            <div className="admin-avatar" aria-hidden="true">
+              {initials}
+            </div>
+
+            <div className="admin-user-info">
+              <span className="admin-user-name">{user?.fullName || 'Administrator'}</span>
+              <span className="admin-user-role">Super Admin</span>
+            </div>
+
+            <button
+              type="button"
+              className="admin-logout-btn"
+              onClick={logout}
+              title="Sign out of administration"
+            >
+              <LogOut size={16} />
+              <span>Sign out</span>
+            </button>
           </div>
-
-          <div>
-            <strong>
-              {user?.fullName || 'Administrator'}
-            </strong>
-
-            <small>
-              {user?.email || 'Loading profile...'}
-            </small>
-          </div>
-
-          <button
-            type="button"
-            className="admin-logout"
-            onClick={logout}
-            title="Sign out"
-          >
-            <span>↩</span>
-            Logout
-          </button>
-
         </div>
       </header>
 
+      {/* Backdrop for mobile navigation */}
+      {mobileMenuOpen && (
+        <div
+          className="admin-sidebar-backdrop"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       {/* =========================================================
           SIDEBAR
       ========================================================== */}
-      <aside
-        className="admin-sidebar"
-        aria-label="Admin navigation"
-      >
+      <aside className={`admin-sidebar ${mobileMenuOpen ? 'open' : ''}`} aria-label="Admin navigation">
+        <div className="admin-sidebar-scroll">
+          {/* Group 1: Workspace Core */}
+          <div className="admin-nav-group">
+            <p className="admin-sidebar-label">WORKSPACE</p>
+            <nav className="admin-sidebar-nav">
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'overview' ? 'active' : ''}`}
+                onClick={() => changeView('overview')}
+              >
+                <LayoutDashboard size={18} />
+                <span>Overview</span>
+              </button>
 
-        <p className="admin-sidebar-label">
-          Workspace
-        </p>
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'analytics' ? 'active' : ''}`}
+                onClick={() => changeView('analytics')}
+              >
+                <ChartNoAxesCombined size={18} />
+                <span>Analytics</span>
+              </button>
+            </nav>
+          </div>
 
-        <nav className="admin-sidebar-nav">
+          {/* Group 2: User Directory */}
+          <div className="admin-nav-group">
+            <p className="admin-sidebar-label">MANAGEMENT</p>
+            <nav className="admin-sidebar-nav">
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'interns' ? 'active' : ''}`}
+                onClick={() => changeView('interns')}
+              >
+                <Users size={18} />
+                <span>Intern Management</span>
+              </button>
 
-          {/* Overview */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'overview' ? 'active' : ''
-            }`}
-            onClick={() => changeView('overview')}
-          >
-            <span>▦</span>
-            Overview
-          </button>
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'teamleaders' ? 'active' : ''}`}
+                onClick={() => changeView('teamleaders')}
+              >
+                <Briefcase size={18} />
+                <span>Team Leaders</span>
+              </button>
 
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'intern' ? 'active' : ''}`}
+                onClick={() => changeView('intern')}
+              >
+                <UserPlus size={18} />
+                <span>Create Intern</span>
+              </button>
 
-          {/* Analytics */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'analytics' ? 'active' : ''
-            }`}
-            onClick={() => changeView('analytics')}
-          >
-            <span>📊</span>
-            Admin Analytics
-          </button>
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'teamleader' ? 'active' : ''}`}
+                onClick={() => changeView('teamleader')}
+              >
+                <UserCheck size={18} />
+                <span>Create Team Leader</span>
+              </button>
+            </nav>
+          </div>
 
+          {/* Group 3: Certification */}
+          <div className="admin-nav-group">
+            <p className="admin-sidebar-label">CREDENTIALS</p>
+            <nav className="admin-sidebar-nav">
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'requests' ? 'active' : ''}`}
+                onClick={() => changeView('requests')}
+              >
+                <Inbox size={18} />
+                <span>Certificate Requests</span>
+              </button>
 
-          {/* Intern Management */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'interns' ? 'active' : ''
-            }`}
-            onClick={() => changeView('interns')}
-          >
-            <span>👥</span>
-            Intern Management
-          </button>
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'certificates' ? 'active' : ''}`}
+                onClick={() => changeView('certificates')}
+              >
+                <Award size={18} />
+                <span>Issued Certificates</span>
+              </button>
 
+              <button
+                type="button"
+                className="admin-nav-item"
+                onClick={openCertificateTemplates}
+              >
+                <ScrollText size={18} />
+                <span>Certificate Templates</span>
+              </button>
+            </nav>
+          </div>
 
-          {/* Team Leaders */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'teamleaders' ? 'active' : ''
-            }`}
-            onClick={() => changeView('teamleaders')}
-          >
-            <span>👔</span>
-            Team Leaders
-          </button>
+          {/* Group 4: Governance */}
+          <div className="admin-nav-group">
+            <p className="admin-sidebar-label">GOVERNANCE</p>
+            <nav className="admin-sidebar-nav">
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'retention' ? 'active' : ''}`}
+                onClick={() => changeView('retention')}
+              >
+                <Archive size={18} />
+                <span>Account Retention</span>
+              </button>
 
-
-          {/* Create Intern */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'intern' ? 'active' : ''
-            }`}
-            onClick={() => changeView('intern')}
-          >
-            <span>＋</span>
-            Create Intern
-          </button>
-
-
-          {/* Create Team Leader */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'teamleader' ? 'active' : ''
-            }`}
-            onClick={() => changeView('teamleader')}
-          >
-            <span>♙</span>
-            Create Team Leader
-          </button>
-
-
-          {/* Certificate Requests */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'requests' ? 'active' : ''
-            }`}
-            onClick={() => changeView('requests')}
-          >
-            <span>▤</span>
-            Certificate Requests
-          </button>
-
-
-          {/* Issued Certificates */}
-          <button
-            type="button"
-            className={`admin-nav-item ${
-              activeView === 'certificates' ? 'active' : ''
-            }`}
-            onClick={() => changeView('certificates')}
-          >
-            <span>📜</span>
-            Issued Certificates
-          </button>
-
-          <button
-            type="button"
-            className={`admin-nav-item ${activeView === 'retention' ? 'active' : ''}`}
-            onClick={() => changeView('retention')}
-          >
-            <span>♻</span>
-            Account Retention
-          </button>
-
-          <button type="button" className={`admin-nav-item ${activeView === 'audit' ? 'active' : ''}`} onClick={() => changeView('audit')}>
-            <span>◷</span>
-            Audit Logs
-          </button>
-
-
-          {/* =====================================================
-              CERTIFICATE TEMPLATES
-          ====================================================== */}
-          <button
-            type="button"
-            className="admin-nav-item"
-            onClick={openCertificateTemplates}
-          >
-            <span>🎨</span>
-            Certificate Templates
-          </button>
-
-        </nav>
-
-
-        <div className="admin-sidebar-note">
-          <span>●</span>
-          Admin access enabled
+              <button
+                type="button"
+                className={`admin-nav-item ${activeView === 'audit' ? 'active' : ''}`}
+                onClick={() => changeView('audit')}
+              >
+                <ShieldCheck size={18} />
+                <span>Audit Logs</span>
+              </button>
+            </nav>
+          </div>
         </div>
 
+        <div className="admin-sidebar-footer">
+          <div className="admin-sidebar-status">
+            <Shield size={14} className="status-shield-icon" />
+            <div className="status-meta">
+              <span className="status-title">Enterprise Shield</span>
+              <span className="status-desc">Audited & Encrypted</span>
+            </div>
+          </div>
+        </div>
       </aside>
-
 
       {/* =========================================================
           MAIN CONTENT
       ========================================================== */}
       <main className="admin-dashboard-main">
-
         {/* Page Header */}
         <header className="admin-page-header">
+          <div className="admin-header-badge">
+            <Sparkles size={12} />
+            <span>PORTAL ADMINISTRATION</span>
+          </div>
 
-          <p className="admin-eyebrow">
-            ADMINISTRATION
-          </p>
+          <div className="admin-header-title-row">
+            <h1>{getPageTitle()}</h1>
+          </div>
 
-          <h1>
-            {getPageTitle()}
-          </h1>
-
-          <p>
+          <p className="admin-header-description">
             {getPageDescription()}
           </p>
-
         </header>
 
-
-        {/* =======================================================
-            ANALYTICS
-        ======================================================== */}
+        {/* View Routing */}
         {activeView === 'analytics' ? (
-
-          <AnalyticsView
-            onOpenRequests={() =>
-              changeView('requests')
-            }
-          />
-
+          <AnalyticsView onOpenRequests={() => changeView('requests')} />
         ) : activeView === 'overview' ? (
-
-          /* =====================================================
-             OVERVIEW
-          ====================================================== */
           <>
-
-            <section
-              className="admin-profile-card"
-              aria-label="Administrator profile"
-            >
-
-              {/* Profile heading */}
+            {/* Executive Profile Section */}
+            <section className="admin-profile-card" aria-label="Administrator profile">
               <div className="admin-profile-heading">
-
                 <div className="admin-profile-avatar">
                   {initials}
                 </div>
 
-                <div>
-                  <p className="admin-eyebrow">
-                    YOUR PROFILE
-                  </p>
-
-                  <h2>
-                    {user?.fullName ||
-                      'Administrator'}
-                  </h2>
-
-                  <p>
-                    {user?.email ||
-                      'Loading profile...'}
-                  </p>
+                <div className="admin-profile-meta">
+                  <div className="admin-profile-badge-row">
+                    <span className="admin-badge admin-badge-primary">Administrator</span>
+                    <span className="admin-badge admin-badge-neutral">Full Privilege</span>
+                  </div>
+                  <h2>{user?.fullName || 'Administrator'}</h2>
+                  <p className="admin-profile-email">{user?.email || 'admin@uptoskills.com'}</p>
                 </div>
-
               </div>
 
-
-              {/* Profile details */}
               <div className="admin-profile-details">
-
-                <div>
-                  <span>Role</span>
-
-                  <strong>
-                    {user?.role || 'admin'}
-                  </strong>
+                <div className="admin-detail-item">
+                  <div className="detail-item-icon">
+                    <Shield size={16} />
+                  </div>
+                  <div className="detail-item-content">
+                    <span>Role Access</span>
+                    <strong>{user?.role || 'Super Admin'}</strong>
+                  </div>
                 </div>
 
-                <div>
-                  <span>Mobile number</span>
-
-                  <strong>
-                    {user?.mobileNo ||
-                      'Not provided'}
-                  </strong>
+                <div className="admin-detail-item">
+                  <div className="detail-item-icon">
+                    <Phone size={16} />
+                  </div>
+                  <div className="detail-item-content">
+                    <span>Contact Line</span>
+                    <strong>{user?.mobileNo || 'Verified Internal'}</strong>
+                  </div>
                 </div>
 
-                <div>
-                  <span>Member since</span>
-
-                  <strong>
-                    {user?.createdAt
-                      ? new Date(
-                          user.createdAt
-                        ).toLocaleDateString(
-                          'en-US',
-                          {
+                <div className="admin-detail-item">
+                  <div className="detail-item-icon">
+                    <Calendar size={16} />
+                  </div>
+                  <div className="detail-item-content">
+                    <span>Platform Member</span>
+                    <strong>
+                      {user?.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',
-                          }
-                        )
-                      : '—'}
-                  </strong>
+                          })
+                        : 'Active since launch'}
+                    </strong>
+                  </div>
                 </div>
-
               </div>
 
+              {/* Quick Actions Shortcuts */}
+              <div className="admin-quick-actions-section">
+                <h3 className="section-subtitle">Operational Shortcuts</h3>
+                <div className="admin-quick-actions">
+                  <button type="button" onClick={() => changeView('analytics')}>
+                    <span className="action-icon-wrap">
+                      <ChartNoAxesCombined size={20} />
+                    </span>
+                    <div className="action-text-wrap">
+                      <strong>Admin Analytics</strong>
+                      <small>Live metrics, bottlenecks & domain trends</small>
+                    </div>
+                  </button>
 
-              {/* =================================================
-                  QUICK ACTIONS
-              ================================================== */}
-              <div className="admin-quick-actions">
+                  <button type="button" onClick={() => changeView('interns')}>
+                    <span className="action-icon-wrap">
+                      <Users size={20} />
+                    </span>
+                    <div className="action-text-wrap">
+                      <strong>Intern Directory</strong>
+                      <small>Manage interns & team assignments</small>
+                    </div>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    changeView('analytics')
-                  }
-                >
-                  <span>📊</span>
-                  <strong>
-                    Admin Analytics
-                  </strong>
-                  <small>
-                    View bottlenecks & metrics
-                  </small>
-                </button>
+                  <button type="button" onClick={() => changeView('teamleaders')}>
+                    <span className="action-icon-wrap">
+                      <Briefcase size={20} />
+                    </span>
+                    <div className="action-text-wrap">
+                      <strong>Team Leaders</strong>
+                      <small>Review leader workload & intern rosters</small>
+                    </div>
+                  </button>
 
+                  <button type="button" onClick={() => changeView('intern')}>
+                    <span className="action-icon-wrap">
+                      <UserPlus size={20} />
+                    </span>
+                    <div className="action-text-wrap">
+                      <strong>Create Intern</strong>
+                      <small>Register and provision a new intern profile</small>
+                    </div>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    changeView('interns')
-                  }
-                >
-                  <span>👥</span>
-                  <strong>
-                    Intern Management
-                  </strong>
-                  <small>
-                    Manage interns & TL
-                    assignments
-                  </small>
-                </button>
+                  <button type="button" onClick={() => changeView('teamleader')}>
+                    <span className="action-icon-wrap">
+                      <UserCheck size={20} />
+                    </span>
+                    <div className="action-text-wrap">
+                      <strong>Create Team Leader</strong>
+                      <small>Onboard a manager with intern oversight</small>
+                    </div>
+                  </button>
 
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    changeView('teamleaders')
-                  }
-                >
-                  <span>👔</span>
-                  <strong>
-                    Team Leaders
-                  </strong>
-                  <small>
-                    Oversee all team leaders
-                  </small>
-                </button>
-
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    changeView('intern')
-                  }
-                >
-                  <span>＋</span>
-                  <strong>
-                    Create Intern
-                  </strong>
-                  <small>
-                    Register a new intern
-                    account
-                  </small>
-                </button>
-
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    changeView('teamleader')
-                  }
-                >
-                  <span>♙</span>
-                  <strong>
-                    Create Team Leader
-                  </strong>
-                  <small>
-                    Add a team leader to
-                    the portal
-                  </small>
-                </button>
-
-
-                {/* =================================================
-                    NEW: CERTIFICATE TEMPLATE CARD
-                ================================================== */}
-                <button
-                  type="button"
-                  onClick={
-                    openCertificateTemplates
-                  }
-                >
-                  <span>🎨</span>
-
-                  <strong>
-                    Certificate Templates
-                  </strong>
-
-                  <small>
-                    Design & manage certificate
-                    templates
-                  </small>
-                </button>
-
+                  <button type="button" onClick={openCertificateTemplates}>
+                    <span className="action-icon-wrap">
+                      <ScrollText size={20} />
+                    </span>
+                    <div className="action-text-wrap">
+                      <strong>Certificate Templates</strong>
+                      <small>Design credentials via visual HTML builder</small>
+                    </div>
+                  </button>
+                </div>
               </div>
-
             </section>
-
 
             {/* Upcoming completions */}
             <AdminUpcomingCompletions />
-
           </>
-
         ) : activeView === 'interns' ? (
-
-          /* =====================================================
-             INTERN MANAGEMENT
-          ====================================================== */
           <AdminInternsList />
-
         ) : activeView === 'teamleaders' ? (
-
-          /* =====================================================
-             TEAM LEADERS
-          ====================================================== */
           <TeamLeadersSection />
-
         ) : activeView === 'intern' ? (
-
-          /* =====================================================
-             CREATE INTERN
-          ====================================================== */
           <CreateIntern />
-
         ) : activeView === 'teamleader' ? (
-
-          /* =====================================================
-             CREATE TEAM LEADER
-          ====================================================== */
           <CreateTl />
-
         ) : activeView === 'certificates' ? (
-
-          /* =====================================================
-             ISSUED CERTIFICATES
-          ====================================================== */
           <CertificatesOverview />
-
         ) : activeView === 'retention' ? (
-
           <RetentionManagement />
-
         ) : activeView === 'audit' ? (
-
           <AuditLogsPage />
-
         ) : (
-
-          /* =====================================================
-             CERTIFICATE REQUESTS
-          ====================================================== */
           <ForwardedRequestsList />
-
         )}
-
       </main>
-
     </div>
   );
 };

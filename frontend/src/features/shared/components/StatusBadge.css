@@ -1,4 +1,91 @@
-.status-badge { display: inline-flex; align-items: center; width: fit-content; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: capitalize; }
-.status-pending { color: #f59e0b; background: color-mix(in srgb, #f59e0b 15%, transparent); }
-.status-forwarded, .status-approved, .status-completed { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
-.status-rejected { color: var(--error); background: color-mix(in srgb, var(--error) 14%, transparent); }
+.status-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.status-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Specific status colors */
+.status-pill-badge.status-upcoming {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  border-color: rgba(79, 70, 229, 0.2);
+}
+.status-pill-badge.status-upcoming .status-badge-dot {
+  background-color: var(--color-primary);
+}
+
+.status-pill-badge.status-ongoing,
+.status-pill-badge.status-active {
+  color: #0D9488;
+  background-color: #CCFBF1;
+  border-color: rgba(13, 148, 136, 0.2);
+}
+.status-pill-badge.status-ongoing .status-badge-dot,
+.status-pill-badge.status-active .status-badge-dot {
+  background-color: #0D9488;
+}
+
+.status-pill-badge.status-completed,
+.status-pill-badge.status-approved,
+.status-pill-badge.status-forwarded,
+.status-pill-badge.status-finalized,
+.status-pill-badge.status-issued {
+  color: var(--color-success);
+  background-color: var(--color-success-light);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+.status-pill-badge.status-completed .status-badge-dot,
+.status-pill-badge.status-approved .status-badge-dot,
+.status-pill-badge.status-forwarded .status-badge-dot,
+.status-pill-badge.status-finalized .status-badge-dot,
+.status-pill-badge.status-issued .status-badge-dot {
+  background-color: var(--color-success);
+}
+
+.status-pill-badge.status-pending {
+  color: var(--color-warning);
+  background-color: var(--color-warning-light);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+.status-pill-badge.status-pending .status-badge-dot {
+  background-color: var(--color-warning);
+}
+
+.status-pill-badge.status-rejected,
+.status-pill-badge.status-cancelled,
+.status-pill-badge.status-revoked {
+  color: var(--color-error);
+  background-color: var(--color-error-light);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+.status-pill-badge.status-rejected .status-badge-dot,
+.status-pill-badge.status-cancelled .status-badge-dot,
+.status-pill-badge.status-revoked .status-badge-dot {
+  background-color: var(--color-error);
+}
+
+.status-pill-badge.status-unknown,
+.status-pill-badge.status-draft {
+  color: var(--text-secondary);
+  background-color: var(--bg-page);
+  border-color: var(--border-default);
+}
+.status-pill-badge.status-unknown .status-badge-dot,
+.status-pill-badge.status-draft .status-badge-dot {
+  background-color: var(--text-muted);
+}

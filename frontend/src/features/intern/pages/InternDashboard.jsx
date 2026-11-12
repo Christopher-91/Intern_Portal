@@ -5,10 +5,34 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import RequestCertificateModal from '../components/RequestCertificateModal';
 import MyRequestsList from '../components/MyRequestsList';
 import NotificationBell from '../../shared/components/NotificationBell';
+import BrandLogo from '../../shared/components/BrandLogo';
+import {
+  LayoutDashboard,
+  Award,
+  LogOut,
+  Mail,
+  KeyRound,
+  Code,
+  GraduationCap,
+  CheckCircle2,
+  Phone,
+  Tag,
+  Laptop,
+  Calendar,
+  CalendarDays,
+  CalendarCheck,
+  CalendarClock,
+  ArrowRight,
+  Clock,
+  Percent,
+  AlertCircle,
+  FileText,
+  User
+} from 'lucide-react';
 import './InternDashboard.css';
 import '../../../app/App.css';
 
-/* ── helpers ── */
+/* helpers */
 const formatDate = (iso) => {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-US', {
@@ -41,10 +65,10 @@ const calcDaysLeft = (end) => {
   return diff > 0 ? diff : 0;
 };
 
-/* ── nav items ── */
+/* nav items */
 const NAV_ITEMS = [
-  { icon: '🏠', label: 'Dashboard', id: 'dashboard' },
-  { icon: '📄', label: 'Certificates', id: 'certificates' },
+  { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard' },
+  { icon: Award, label: 'Certificates', id: 'certificates' },
 ];
 
 /* ============================================================
@@ -68,21 +92,20 @@ export default function InternDashboard() {
     if (searchParams.has('view')) setSearchParams({});
   };
 
-  /* ── derived ── */
+  /* derived */
   const initials = profile ? getInitials(profile.fullName) : '?';
   const progress = profile
     ? calcProgress(profile.startDate, profile.endDate)
     : 0;
   const daysLeft = profile ? calcDaysLeft(profile.endDate) : '—';
 
-  /* ── render ── */
+  /* render */
   return (
     <div className="intern-dashboard-page">
       {/* ─── Top Navbar ─── */}
       <nav className="id-navbar">
         <div className="id-brand">
-          <span className="id-brand-icon">🚀</span>
-          uptoskills
+          <BrandLogo size="small" subtitle="Intern" />
         </div>
 
         <div className="id-nav-right">
@@ -99,28 +122,34 @@ export default function InternDashboard() {
             id="intern-logout-btn"
             className="id-logout-btn"
             onClick={onLogout}
-            title="Sign out"
+            title="Sign out of intern portal"
           >
-            <span>↩</span> Logout
+            <LogOut size={14} />
+            <span>Sign out</span>
           </button>
         </div>
       </nav>
 
       {/* ─── Sidebar ─── */}
       <aside className="id-sidebar" role="navigation" aria-label="Sidebar">
-        <p className="id-sidebar-label">Main Menu</p>
+        <p className="id-sidebar-label">WORKSPACE</p>
         <nav className="id-sidebar-nav">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              id={`sidebar-nav-${item.id}`}
-              className={`id-nav-item ${activeNav === item.id ? 'active' : ''}`}
-              onClick={() => changeNav(item.id)}
-            >
-              <span className="id-nav-icon">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                id={`sidebar-nav-${item.id}`}
+                className={`id-nav-item ${activeNav === item.id ? 'active' : ''}`}
+                onClick={() => changeNav(item.id)}
+              >
+                <span className="id-nav-icon">
+                  <Icon size={16} />
+                </span>
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
       </aside>
 
@@ -129,20 +158,22 @@ export default function InternDashboard() {
         {/* Page header */}
         <header className="id-page-header">
           <h1 className="id-greeting">
-            Hello,{' '}
-            <em>{profile?.fullName ?? '…'}</em> 👋
+            Welcome back, <em>{profile?.fullName ?? 'Intern'}</em>
           </h1>
           <p className="id-subtext">
-            Here's your internship overview for today.
+            Here is your active internship tenure overview and credential progress.
           </p>
         </header>
 
         {activeNav === 'dashboard' && archiveNotice && (
           <div className="id-archive-warning" role="status">
-            <strong>Account archival scheduled</strong>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock size={16} style={{ color: '#F59E0B' }} />
+              <strong>Account Archival Notice</strong>
+            </div>
             <span>
-              Your account is scheduled to be archived on {formatDate(archiveNotice.archiveDate)}.
-              {' '}You have {archiveNotice.daysUntilArchive} day{archiveNotice.daysUntilArchive === 1 ? '' : 's'} remaining to access your portal account and certificates.
+              Your account is scheduled for archival on {formatDate(archiveNotice.archiveDate)}.
+              {' '}You have {archiveNotice.daysUntilArchive} day{archiveNotice.daysUntilArchive === 1 ? '' : 's'} remaining to access your portal records and download official certificates.
             </span>
           </div>
         )}
@@ -150,8 +181,18 @@ export default function InternDashboard() {
         {activeNav === 'certificates' && (
           <>
             <section className="certificate-actions" aria-label="Certificate requests">
-              <div><p className="request-eyebrow">CERTIFICATE DESK</p><h2>Request a certificate</h2><p>Choose a certificate and follow its progress here.</p></div>
-              <button type="button" className="request-primary-button" onClick={() => setShowCertificateModal(true)}>Request certificate</button>
+              <div>
+                <h2>Request a Certificate</h2>
+                <p>Submit certificate requests for completed milestones and verify issuance status.</p>
+              </div>
+              <button
+                type="button"
+                className="request-primary-button"
+                onClick={() => setShowCertificateModal(true)}
+              >
+                <Award size={14} style={{ display: 'inline', marginRight: '6px' }} />
+                <span>New Certificate Request</span>
+              </button>
             </section>
             <MyRequestsList />
           </>
@@ -161,14 +202,14 @@ export default function InternDashboard() {
         {activeNav === 'dashboard' && loading && (
           <div className="id-loading" role="status" aria-live="polite">
             <div className="id-spinner" aria-hidden="true" />
-            <span>Loading your profile…</span>
+            <span>Loading internship profile…</span>
           </div>
         )}
 
         {/* ── Error state ── */}
         {activeNav === 'dashboard' && !loading && error && (
           <div className="id-error" role="alert">
-            <span className="id-error-icon">⚠️</span>
+            <AlertCircle size={28} className="id-error-icon" />
             <span>{error}</span>
             <button
               id="retry-profile-btn"
@@ -191,19 +232,26 @@ export default function InternDashboard() {
                 </div>
                 <div className="id-profile-identity">
                   <h2 className="id-profile-name">{profile.fullName}</h2>
-                  <p className="id-profile-email">✉️ {profile.email}</p>
+                  <p className="id-profile-email">
+                    <Mail size={13} style={{ display: 'inline', marginRight: '6px' }} />
+                    {profile.email}
+                  </p>
                   <div className="id-badge-row">
                     <span className="id-badge id-badge-code">
-                      🔑 {profile.internCode}
+                      <KeyRound size={11} />
+                      <span>{profile.internCode}</span>
                     </span>
                     <span className="id-badge id-badge-domain">
-                      💻 {profile.domain}
+                      <Code size={11} />
+                      <span>{profile.domain}</span>
                     </span>
                     <span className="id-badge id-badge-role">
-                      🎓 {profile.role}
+                      <GraduationCap size={11} />
+                      <span>{profile.role}</span>
                     </span>
                     <span className="id-badge id-badge-active">
-                      ✅ Active
+                      <CheckCircle2 size={11} />
+                      <span>Active</span>
                     </span>
                   </div>
                 </div>
@@ -212,22 +260,34 @@ export default function InternDashboard() {
               {/* Detail grid */}
               <div className="id-detail-grid">
                 <div className="id-detail-item">
-                  <div className="id-detail-label">📱 Mobile</div>
-                  <div className="id-detail-value">{profile.mobileNo}</div>
+                  <div className="id-detail-label">
+                    <Phone size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                    <span>Mobile Contact</span>
+                  </div>
+                  <div className="id-detail-value">{profile.mobileNo || 'Not provided'}</div>
                 </div>
 
                 <div className="id-detail-item">
-                  <div className="id-detail-label">🏷️ Intern Code</div>
+                  <div className="id-detail-label">
+                    <Tag size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                    <span>Intern Code</span>
+                  </div>
                   <div className="id-detail-value">{profile.internCode}</div>
                 </div>
 
                 <div className="id-detail-item">
-                  <div className="id-detail-label">🖥️ Domain</div>
+                  <div className="id-detail-label">
+                    <Laptop size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                    <span>Domain Track</span>
+                  </div>
                   <div className="id-detail-value">{profile.domain}</div>
                 </div>
 
                 <div className="id-detail-item">
-                  <div className="id-detail-label">📅 Member Since</div>
+                  <div className="id-detail-label">
+                    <Calendar size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                    <span>Member Since</span>
+                  </div>
                   <div className="id-detail-value">
                     {formatDate(profile.createdAt)}
                   </div>
@@ -237,20 +297,31 @@ export default function InternDashboard() {
 
             {/* Internship Timeline */}
             <section aria-label="Internship timeline">
-              <h3 className="id-section-title">📆 Internship Timeline</h3>
+              <h3 className="id-section-title">
+                <CalendarDays size={16} style={{ display: 'inline', marginRight: '6px' }} />
+                <span>Internship Tenure & Milestones</span>
+              </h3>
               <div className="id-timeline-card">
                 <div className="id-date-row">
                   <div className="id-date-block start">
-                    <div className="id-date-label">🟢 Start Date</div>
+                    <div className="id-date-label">
+                      <CalendarCheck size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                      <span>Start Date</span>
+                    </div>
                     <div className="id-date-value">
                       {formatDate(profile.startDate)}
                     </div>
                   </div>
 
-                  <div className="id-arrow" aria-hidden="true">→</div>
+                  <div className="id-arrow" aria-hidden="true">
+                    <ArrowRight size={18} />
+                  </div>
 
                   <div className="id-date-block end">
-                    <div className="id-date-label">🔵 End Date</div>
+                    <div className="id-date-label">
+                      <CalendarClock size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                      <span>End Date</span>
+                    </div>
                     <div className="id-date-value">
                       {formatDate(profile.endDate)}
                     </div>
@@ -259,8 +330,8 @@ export default function InternDashboard() {
 
                 <div className="id-progress-wrapper">
                   <div className="id-progress-label">
-                    <span>Progress</span>
-                    <span>{progress}%</span>
+                    <span>Program Completion</span>
+                    <strong>{progress}%</strong>
                   </div>
                   <div
                     className="id-progress-track"
@@ -281,30 +352,37 @@ export default function InternDashboard() {
             {/* Stat Grid */}
             <div className="id-stat-grid" aria-label="Quick stats">
               <div className="id-stat-card">
-                <div className="id-stat-icon accent">🎭</div>
+                <div className="id-stat-icon accent">
+                  <User size={18} />
+                </div>
                 <div className="id-stat-label">Role</div>
                 <div className="id-stat-value accent">{profile.role}</div>
               </div>
 
               <div className="id-stat-card">
-                <div className="id-stat-icon success">💻</div>
-                <div className="id-stat-label">Domain</div>
+                <div className="id-stat-icon success">
+                  <Code size={18} />
+                </div>
+                <div className="id-stat-label">Track</div>
                 <div className="id-stat-value success">{profile.domain}</div>
               </div>
 
               <div className="id-stat-card">
-                <div className="id-stat-icon warning">⏳</div>
+                <div className="id-stat-icon warning">
+                  <Clock size={18} />
+                </div>
                 <div className="id-stat-label">Days Remaining</div>
                 <div className="id-stat-value warning">{daysLeft}</div>
               </div>
 
               <div className="id-stat-card">
-                <div className="id-stat-icon info">📊</div>
-                <div className="id-stat-label">Completion</div>
+                <div className="id-stat-icon info">
+                  <Percent size={18} />
+                </div>
+                <div className="id-stat-label">Elapsed</div>
                 <div className="id-stat-value info">{progress}%</div>
               </div>
             </div>
-
           </>
         )}
       </main>
