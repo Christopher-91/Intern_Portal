@@ -53,6 +53,37 @@ export const updateCertificateDraft = (id, htmlContent) => request('patch', `/ap
 export const finalizeCertificate = (id) => request('post', `/api/admin/certificates/${id}/finalize`);
 export const revokeCertificate = (id, reason) => request('patch', `/api/admin/certificates/${id}/revoke`, { reason });
 export const unrevokeCertificate = (id) => request('patch', `/api/admin/certificates/${id}/unrevoke`);
+export const revokeAdminCertificate = revokeCertificate;
+export const unrevokeAdminCertificate = unrevokeCertificate;
+
+// Retention Policy API
+export const getRetentionPolicy = () => request('get', '/api/admin/retention-policy');
+export const updateRetentionPolicy = (payload) => request('patch', '/api/admin/retention-policy', payload);
+
+// Archived Interns API
+export const getArchivedInterns = () => request('get', '/api/admin/interns/archived');
+export const restoreIntern = (id) => request('patch', `/api/admin/interns/${id}/restore`);
+
+// Certificate Templates API
+export const getCertificateTemplates = () => request('get', '/api/admin/templates');
+export const getTemplatePlaceholders = () => request('get', '/api/admin/templates/placeholders');
+export const createCertificateTemplate = (payload) => request('post', '/api/admin/templates', payload);
+export const updateCertificateTemplate = (id, payload) => request('patch', `/api/admin/templates/${id}`, payload);
+
+// Audit Logs API
+export const getAuditLogs = (params = {}) => {
+  const query = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== ''));
+  const qs = query.toString() ? `?${query.toString()}` : '';
+  return request('get', `/api/admin/audit-logs${qs}`);
+};
+export const exportAuditLogs = async (params = {}) => {
+  const query = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== ''));
+  const qs = query.toString() ? `?${query.toString()}` : '';
+  const response = await adminApi.get(`/api/admin/audit-logs/export${qs}`, {
+    responseType: 'blob'
+  });
+  return response.data;
+};
 
 // Day 5 Admin Overview & Retry Generation
 export const getAllCertificates = () => request('get', '/api/admin/certificates');

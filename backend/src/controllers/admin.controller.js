@@ -19,6 +19,8 @@ import {
   sendCertificateEmail
 } from '../services/certificate.service.js';
 import { logAudit } from '../utils/auditLogger.js';
+import { createNotification } from '../utils/notificationService.js';
+import { invalidateAnalyticsCache } from '../utils/redisCache.js';
 import Notification from '../models/Notification.js';
 
 dotenv.config();
@@ -783,102 +785,6 @@ export const verifyCertificatePublic = async (req, res) => {
   }
 };
 
-export const revokeCertificate = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid certificate ID' });
-    }
-
-    const certificate = await Certificate.findById(id);
-    if (!certificate) {
-      return res.status(404).json({ message: 'Certificate not found' });
-    }
-
-    if (certificate.status === 'revoked') {
-      return res.status(200).json({ message: 'Certificate is already revoked', certificate });
-    }
-
-    const { reason } = req.body || {};
-    certificate.status = 'revoked';
-    certificate.revokedBy = req.user?.id || null;
-    certificate.revokedAt = new Date();
-    certificate.revocationReason = reason || 'Administrative revocation';
-    await certificate.save();
-
-    await logAudit({
-      userId: req.user?.id,
-      action: 'REVOKE_CERTIFICATE',
-      entityType: 'Certificate',
-      entityId: certificate._id,
-      description: stripSensitiveAuditFields({
-        certificateNumber: certificate.certificateNumber,
-        reason: certificate.revocationReason,
-        revokedBy: req.user?.id
-      }),
-      req
-    });
-
-    await notifyUser({
-      userId: certificate.userId,
-      title: 'Certificate revoked',
-      message: `Your certificate ${certificate.certificateNumber} has been revoked.`,
-      type: 'certificate'
-    });
-
-    return res.status(200).json({ message: 'Certificate revoked successfully', certificate });
-  } catch (err) {
-    return res.status(500).json({ message: 'Internal server error', error: err.message });
-  }
-};
-
-export const unrevokeCertificate = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid certificate ID' });
-    }
-
-    const certificate = await Certificate.findById(id);
-    if (!certificate) {
-      return res.status(404).json({ message: 'Certificate not found' });
-    }
-
-    if (certificate.status !== 'revoked') {
-      return res.status(200).json({ message: 'Certificate is not revoked', certificate });
-    }
-
-    certificate.status = 'finalized';
-    certificate.revokedAt = null;
-    certificate.revokedBy = null;
-    certificate.revocationReason = '';
-    await certificate.save();
-
-    await logAudit({
-      userId: req.user?.id,
-      action: 'UNREVOKE_CERTIFICATE',
-      entityType: 'Certificate',
-      entityId: certificate._id,
-      description: stripSensitiveAuditFields({
-        certificateNumber: certificate.certificateNumber,
-        restoredBy: req.user?.id
-      }),
-      req
-    });
-
-    await notifyUser({
-      userId: certificate.userId,
-      title: 'Certificate restored',
-      message: `Your certificate ${certificate.certificateNumber} has been restored and is active again.`,
-      type: 'certificate'
-    });
-
-    return res.status(200).json({ message: 'Certificate restored successfully', certificate });
-  } catch (err) {
-    return res.status(500).json({ message: 'Internal server error', error: err.message });
-  }
-};
-
 export const getAllCertificates = async (req, res) => {
   try {
     const certificates = await Certificate.find()
@@ -993,7 +899,7 @@ export const retryCertificateGeneration = async (req, res) => {
 
     // Re-use existing createCertificateDraft service
     const certificate = await createCertificateDraft(request._id);
-    await logAudit({ userId: req.user.id, action: 'CERTIFICATE_DRAFT_CREATED', entityType: 'Certificate', entityId: certificate._id, meta: { requestId: request._id, retried: true }, req });
+    await logAudit({ userId: req.user?.id || null, action: 'CERTIFICATE_DRAFT_CREATED', entityType: 'Certificate', entityId: certificate._id, meta: { requestId: request._id, retried: true }, req });
     await invalidateAnalyticsCache();
 
     return res.status(200).json({

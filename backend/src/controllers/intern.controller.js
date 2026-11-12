@@ -8,6 +8,8 @@ import CertificateRequest from '../models/CertificateRequest.js';
 import Certificate from '../models/Certificate.js';
 import Counter from '../models/Counter.js';
 import Notification from '../models/Notification.js';
+import { logAudit } from '../utils/auditLogger.js';
+import { createNotification } from '../utils/notificationService.js';
 
 const ALLOWED_TYPES = [
   'offer_letter',
@@ -262,18 +264,40 @@ export const markNotificationAsRead = async (req, res) => {
       return res.status(400).json({ message: 'Invalid notification ID' });
     }
 
-    const notification = await markNotificationRead(req.user.id, id);
+    const notification = await Notification.findOne({ _id: id, userId: req.user.id });
 
     if (!notification) {
       return res.status(404).json({ message: 'Notification not found' });
     }
 
-    return res.json({ message: 'Notification marked as read', notification });
+    notification.isRead = true;
+    notification.readAt = new Date();
+    await notification.save();
+
+    return res.status(200).json({ message: 'Notification marked as read', notification });
   } catch (err) {
     return res.status(500).json({
       message: 'Server error',
       error: err.message
     });
+  }
+};
+
+export const markNotificationRead = markNotificationAsRead;
+
+export const markAllNotificationsRead = async (req, res) => {
+  try {
+    const result = await Notification.updateMany({ userId: req.user.id, isRead: false }, {
+      isRead: true,
+      readAt: new Date()
+    });
+
+    return res.status(200).json({
+      message: 'All notifications marked as read',
+      modifiedCount: result.modifiedCount || 0
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
 
@@ -441,58 +465,6 @@ export const downloadCertificateForRequest = async (req, res) => {
     return res.status(500).json({
       message: 'Internal server error'
     });
-  }
-};
-
-export const getNotifications = async (req, res) => {
-  try {
-    const notifications = await Notification.find({ userId: req.user.id }).sort({ createdAt: -1 });
-    const unreadCount = notifications.filter((notification) => !notification.isRead).length;
-
-    return res.status(200).json({
-      notifications,
-      unreadCount
-    });
-  } catch (err) {
-    return res.status(500).json({ message: 'Internal server error', error: err.message });
-  }
-};
-
-export const markNotificationRead = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid notification ID' });
-    }
-
-    const notification = await Notification.findOne({ _id: id, userId: req.user.id });
-    if (!notification) {
-      return res.status(404).json({ message: 'Notification not found' });
-    }
-
-    notification.isRead = true;
-    notification.readAt = new Date();
-    await notification.save();
-
-    return res.status(200).json({ message: 'Notification marked as read', notification });
-  } catch (err) {
-    return res.status(500).json({ message: 'Internal server error', error: err.message });
-  }
-};
-
-export const markAllNotificationsRead = async (req, res) => {
-  try {
-    const result = await Notification.updateMany({ userId: req.user.id, isRead: false }, {
-      isRead: true,
-      readAt: new Date()
-    });
-
-    return res.status(200).json({
-      message: 'All notifications marked as read',
-      modifiedCount: result.modifiedCount || 0
-    });
-  } catch (err) {
-    return res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
 

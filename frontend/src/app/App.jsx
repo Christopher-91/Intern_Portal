@@ -14,7 +14,7 @@ import TLDashboard from '../features/teamleader/pages/TLDashboard';
 import AdminDashboard from '../features/admin/pages/AdminDashboard';
 import CertificateReviewPage from '../features/admin/pages/CertificateReviewPage';
 import CertificateVerificationPage from '../features/public/pages/CertificateVerificationPage';
-import ThemeToggle from '../features/shared/components/ThemeToggle';
+import CertificateTemplateEditorPage from '../features/admin/pages/CertificateTemplateEditorPage';
 import './App.css';
 
 export default function App() {

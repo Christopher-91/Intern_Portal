@@ -9,8 +9,6 @@ import {
   submitCertificateRequest,
   getCertificateForRequest,
   downloadCertificateForRequest,
-  getNotifications,
-  markNotificationRead,
   markAllNotificationsRead
 } from '../controllers/intern.controller.js';
 
@@ -48,9 +46,6 @@ internRouter.get('/requests', getMyRequests);
 // Day 5 Intern Certificate Fetch and Secure Download routes
 internRouter.get('/requests/:id/certificate', getCertificateForRequest);
 internRouter.get('/requests/:id/certificate/download', downloadCertificateForRequest);
-
-internRouter.get('/notifications', getNotifications);
-internRouter.patch('/notifications/:id/read', markNotificationRead);
 internRouter.patch('/notifications/read-all', markAllNotificationsRead);
 
 export default internRouter;

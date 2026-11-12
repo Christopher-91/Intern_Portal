@@ -21,9 +21,14 @@ import {
   unrevokeCertificate,
   retryCertificateGeneration,
   downloadCertificatePdf,
-  revokeCertificate,
-  unrevokeCertificate,
-  getAuditLogs
+  getTemplatePlaceholders,
+  createCertificateTemplate,
+  updateCertificateTemplate,
+  getCertificateTemplates,
+  getRetentionPolicy,
+  updateRetentionPolicy,
+  getArchivedInterns,
+  restoreArchivedIntern
 } from "../controllers/admin.controller.js";
 import { updateInternValidator, assignTeamLeaderValidator } from "../validators/intern.validator.js";
 import verifyAuth from "../middlewares/verifyAuth.js";

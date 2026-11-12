@@ -35,6 +35,12 @@ export async function logAudit({ userId, actor, action, entityType, entityId, ta
       ? JSON.stringify(safeMeta)
       : redactSensitiveText(description || '');
 
+    const rawActorId = actor?._id ?? userId ?? req?.user?.id ?? req?.user?._id;
+    const resolvedUserId = rawActorId && mongoose.Types.ObjectId.isValid(rawActorId)
+      ? rawActorId
+      : null;
+    const actorRole = actor?.role || req?.user?.role || 'system';
+
     await AuditLog.create({
       actorId: resolvedUserId || null,
       userId: resolvedUserId || null,

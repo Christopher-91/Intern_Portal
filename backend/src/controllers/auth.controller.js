@@ -44,11 +44,16 @@ export async function login(req, res) {
         role: user.role
     }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    res.cookie("token", token);
+    res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/'
+    });
     await logAudit({ actor: user, action: 'LOGIN_SUCCESS', targetType: 'Authentication', targetId: user._id, req });
 
     return res.status(200).json({
         message: "User logged in successfully",
+        token,
         user: {
             id: user._id,
             fullName: user.fullName,

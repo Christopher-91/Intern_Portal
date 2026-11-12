@@ -697,6 +697,8 @@ export const createCertificateDraft = async (requestId) => {
      request metadata cannot override trusted values.
   ========================================================= */
 
+  const formattedCertType = certificateTitle;
+
   const trustedCoreData = {
     InternName: user.fullName || '',
     internName: user.fullName || '',
@@ -721,7 +723,11 @@ export const createCertificateDraft = async (requestId) => {
     VerificationCode: verificationCode,
     verificationCode: verificationCode,
     VerifyId: verifyId,
-    verifyId: verifyId
+    verifyId: verifyId,
+    qrCodeUrl: qrCodeDataUrl,
+    QRCodeUrl: qrCodeDataUrl,
+    verificationUrl: verificationUrl,
+    VerificationUrl: verificationUrl
   };
 
   /* =========================================================
@@ -737,6 +743,9 @@ export const createCertificateDraft = async (requestId) => {
      COMPILE HANDLEBARS TEMPLATE
   ========================================================= */
 
+  const compiledTemplate = Handlebars.compile(templateHtml);
+  const htmlContent = compiledTemplate(templateData);
+
   const certificate = await Certificate.create({
     certificateNumber,
     userId: user._id,
@@ -751,6 +760,7 @@ export const createCertificateDraft = async (requestId) => {
     htmlContent,
     verificationCode,
     verifyId,
+    verificationIdVersion: 2,
     generatedBy: request.reviewedBy
   });
 

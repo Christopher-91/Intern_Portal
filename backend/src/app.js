@@ -7,6 +7,8 @@ import authRouter from './routes/auth.routes.js';
 import internRouter from './routes/intern.routes.js';
 import adminRouter from './routes/admin.routes.js';
 import teamleaderRouter from './routes/teamleader.routes.js';
+import notificationRouter from './routes/notification.routes.js';
+import analyticsRouter from './routes/adminAnalytics.routes.js';
 import { verifyCertificatePublic } from './controllers/admin.controller.js';
 
 
@@ -18,8 +20,23 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const app = express();
 
 // Allow the frontend to send and receive the authentication cookie.
+const allowedOrigins = new Set([
+	process.env.FRONTEND_URL,
+	'http://localhost:5173',
+	'http://localhost:5174',
+	'http://localhost:5175',
+	'http://127.0.0.1:5173',
+	'http://127.0.0.1:5174',
+	'http://127.0.0.1:5175'
+].filter(Boolean));
+
 app.use(cors({
-	origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+	origin: (origin, callback) => {
+		if (!origin || allowedOrigins.has(origin) || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+			return callback(null, true);
+		}
+		return callback(new Error(`Not allowed by CORS: ${origin}`));
+	},
 	credentials: true
 }));
 
