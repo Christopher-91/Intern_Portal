@@ -174,11 +174,6 @@ const AdminDashboard = () => {
         </div>
 
         <div className="admin-topbar-right">
-          <div className="system-status-indicator" title="System operational">
-            <span className="status-indicator-dot" />
-            <span className="status-indicator-label">Live</span>
-          </div>
-
           <NotificationBell />
 
           <div className="admin-user-profile-menu">
@@ -525,7 +520,7 @@ const AdminDashboard = () => {
                       </span>
                       <div className="action-text-wrap">
                         <strong>Admin Analytics</strong>
-                        <small>Live throughput, SLA trends & track distribution</small>
+                        <small>Throughput, SLA trends & track distribution</small>
                       </div>
                     </div>
                   </button>
@@ -645,7 +640,7 @@ const AdminDashboard = () => {
                       </span>
                       <div className="action-text-wrap">
                         <strong>Certificate Templates</strong>
-                        <small>Visual HTML template designer & live preview</small>
+                        <small>Visual HTML template designer & preview</small>
                       </div>
                     </div>
                   </button>

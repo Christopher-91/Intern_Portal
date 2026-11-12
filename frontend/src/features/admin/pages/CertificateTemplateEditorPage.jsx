@@ -440,7 +440,7 @@ export default function CertificateTemplateEditorPage() {
             style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
           >
             {previewMode ? <Code size={14} /> : <Eye size={14} />}
-            <span>{previewMode ? "Code Editor" : "Live Sample Preview"}</span>
+            <span>{previewMode ? "Code Editor" : "Sample Preview"}</span>
           </button>
         </div>
       </div>
@@ -559,7 +559,7 @@ export default function CertificateTemplateEditorPage() {
                   fontWeight: 700,
                 }}
               >
-                A4 Landscape Live Preview (Rendered with sample intern data)
+                A4 Landscape Preview (Rendered with sample intern data)
               </h2>
 
               <div

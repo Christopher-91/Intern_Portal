@@ -40,7 +40,7 @@ export default function CertificatePreview({ htmlContent = '' }) {
       <header className="certificate-preview-header">
         <div className="certificate-preview-title-group">
           <span className="certificate-preview-status-dot" aria-hidden="true" />
-          <h2 className="certificate-preview-title">Certificate Live Preview</h2>
+          <h2 className="certificate-preview-title">Certificate Preview</h2>
         </div>
         <div className="certificate-preview-badge">
           <span>Real-time HTML</span>
@@ -52,7 +52,7 @@ export default function CertificatePreview({ htmlContent = '' }) {
           <iframe
             ref={iframeRef}
             srcDoc={htmlContent}
-            title="Certificate Live Preview"
+            title="Certificate Preview"
             className="certificate-preview-iframe"
             sandbox="allow-same-origin allow-popups"
             loading="lazy"
@@ -63,7 +63,7 @@ export default function CertificatePreview({ htmlContent = '' }) {
               <FileText size={28} />
             </div>
             <h3>No Certificate Content</h3>
-            <p>The certificate template is currently empty. Edit the HTML in the editor panel to view the live preview.</p>
+            <p>The certificate template is currently empty. Edit the HTML in the editor panel to view the preview.</p>
           </div>
         )}
       </div>
