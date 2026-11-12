@@ -8,6 +8,14 @@ const adminApi = axios.create({
   withCredentials: true,
 });
 
+adminApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 const request = async (method, url, payload) => {
   try {
     const response = await adminApi({ method, url, data: payload });

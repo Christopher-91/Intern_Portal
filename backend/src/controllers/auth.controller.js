@@ -44,9 +44,11 @@ export async function login(req, res) {
         role: user.role
     }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie("token", token, {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction,
         path: '/'
     });
     await logAudit({ actor: user, action: 'LOGIN_SUCCESS', targetType: 'Authentication', targetId: user._id, req });
