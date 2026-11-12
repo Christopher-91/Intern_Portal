@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, AlertTriangle, AlertCircle, Loader2 } from 'lucide-react';
 
-const PUBLIC_VERIFY_URL = 'http://localhost:3000/api/public/certificates/verify';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000').replace(/\/+$/, '');
+const PUBLIC_VERIFY_URL = `${API_BASE_URL}/api/public/certificates/verify`;
 
 export default function CertificateVerificationPage() {
   const [searchParams] = useSearchParams();
