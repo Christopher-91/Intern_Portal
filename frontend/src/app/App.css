@@ -279,6 +279,17 @@ a:hover {
   z-index: 1;
 }
 
+.brand-panel .brand-logo-upto,
+.brand-panel .brand-logo-skills {
+  color: #a5b4fc !important;
+}
+
+.brand-panel .brand-logo-subtitle {
+  background: rgba(99, 102, 241, 0.22) !important;
+  color: #a5b4fc !important;
+  border: 1px solid rgba(99, 102, 241, 0.4) !important;
+}
+
 .brand-panel-body {
   position: relative;
   z-index: 1;

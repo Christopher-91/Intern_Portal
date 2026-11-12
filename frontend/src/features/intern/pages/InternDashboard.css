@@ -662,10 +662,10 @@
     gap: 4px;
     margin: 0 0 22px;
     padding: 14px 16px;
-    border: 1px solid color-mix(in srgb, #f59e0b 45%, var(--border));
-    border-left: 4px solid #f59e0b;
-    border-radius: 12px;
-    background: color-mix(in srgb, #f59e0b 12%, var(--card));
+    border: 1px solid var(--warning-border);
+    border-left: 4px solid var(--warning);
+    border-radius: var(--radius-md);
+    background: var(--warning-bg);
     color: var(--text);
 }
 

@@ -40,11 +40,13 @@ export default function BrandLogo({ size = 'medium', collapsed = false, subtitle
       {!collapsed && (
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ fontWeight: 800, letterSpacing: '-0.03em', fontSize: size === 'large' ? '22px' : '17px', color: 'var(--text)' }}>
-              Upto<span style={{ color: 'var(--primary, #4F46E5)' }}>Skills</span>
+            <span style={{ fontWeight: 800, letterSpacing: '-0.03em', fontSize: size === 'large' ? '22px' : '17px', color: 'var(--primary, #4F46E5)' }}>
+              <span className="brand-logo-upto" style={{ color: 'var(--primary, #4F46E5)' }}>Upto</span>
+              <span className="brand-logo-skills" style={{ color: 'var(--primary, #4F46E5)' }}>Skills</span>
             </span>
             {subtitle && (
               <span
+                className="brand-logo-subtitle"
                 style={{
                   fontSize: '10px',
                   fontWeight: 600,
