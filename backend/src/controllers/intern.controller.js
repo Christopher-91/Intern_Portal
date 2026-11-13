@@ -8,6 +8,7 @@ import CertificateRequest from '../models/CertificateRequest.js';
 import Certificate from '../models/Certificate.js';
 import Counter from '../models/Counter.js';
 import Notification from '../models/Notification.js';
+import RetentionPolicy from '../models/RetentionPolicy.js';
 import { logAudit } from '../utils/auditLogger.js';
 import { createNotification } from '../utils/notificationService.js';
 
